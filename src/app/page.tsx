@@ -233,6 +233,15 @@ export default function Home() {
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap');
         
+        * {
+          box-sizing: border-box;
+        }
+        
+        body {
+          margin: 0;
+          overflow-x: hidden;
+        }
+        
         @keyframes float {
           0%, 100% { transform: translateY(0) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(5deg); }
@@ -335,6 +344,20 @@ export default function Home() {
         .stagger-3 { animation: slideUp 0.6s ease-out 0.3s both; }
         .stagger-4 { animation: slideUp 0.6s ease-out 0.4s both; }
         .stagger-5 { animation: slideUp 0.6s ease-out 0.5s both; }
+        
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 768px) {
+          .card-hover:hover {
+            transform: none !important;
+            box-shadow: none !important;
+          }
+          .btn-hover:hover {
+            transform: none !important;
+          }
+          .nav-btn:hover {
+            transform: none !important;
+          }
+        }
       `}</style>
       
       <div style={styles.container}>
@@ -348,11 +371,11 @@ export default function Home() {
           <div style={styles.noiseOverlay} />
         </div>
 
-        {/* Floating Particles */}
+        {/* Floating Particles - Hidden on mobile */}
         {mounted && [...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="animate-float"
+            className="animate-float hidden-mobile"
             style={{
               ...styles.particle,
               left: `${10 + i * 15}%`,
@@ -392,7 +415,10 @@ export default function Home() {
                 style={activeTab === tab ? styles.navButtonActive : styles.navButton}
                 onClick={() => setActiveTab(tab)}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                <span style={styles.navIcon}>
+                  {tab === 'markets' ? '📊' : tab === 'portfolio' ? '💼' : '🏆'}
+                </span>
+                <span style={styles.navLabel}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
               </button>
             ))}
           </nav>
@@ -876,6 +902,9 @@ export default function Home() {
   )
 }
 
+// Funzione helper per valori responsive
+const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
 const styles: { [key: string]: React.CSSProperties } = {
   container: { 
     minHeight: '100vh', 
@@ -963,178 +992,197 @@ const styles: { [key: string]: React.CSSProperties } = {
   notification: { 
     position: 'fixed', 
     top: 20, 
-    right: 20, 
-    padding: '16px 24px', 
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '12px 20px', 
     borderRadius: 12, 
     color: '#fff', 
     fontWeight: 600, 
     zIndex: 1000,
     backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255,255,255,0.1)'
+    border: '1px solid rgba(255,255,255,0.1)',
+    fontSize: 14,
+    maxWidth: '90%',
+    textAlign: 'center'
   },
   header: { 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
-    padding: '20px 40px', 
+    padding: 'clamp(10px, 2vw, 20px) clamp(12px, 3vw, 40px)', 
     borderBottom: '1px solid rgba(255,255,255,0.1)', 
     background: 'rgba(10,10,15,0.7)', 
     backdropFilter: 'blur(20px)',
     position: 'sticky', 
     top: 0, 
-    zIndex: 100 
+    zIndex: 100,
+    gap: 8,
+    flexWrap: 'wrap' as const
   },
-  logo: { display: 'flex', alignItems: 'center', gap: 10 },
+  logo: { display: 'flex', alignItems: 'center', gap: 'clamp(4px, 1vw, 10px)' },
   logoIcon: { 
-    fontSize: 36, 
+    fontSize: 'clamp(24px, 4vw, 36px)', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent',
     filter: 'drop-shadow(0 0 10px rgba(0,210,211,0.5))'
   },
   logoText: { 
-    fontSize: 26, 
+    fontSize: 'clamp(16px, 3vw, 26px)', 
     fontWeight: 700,
     fontFamily: "'Orbitron', sans-serif",
-    letterSpacing: '2px'
+    letterSpacing: 'clamp(1px, 0.3vw, 2px)'
   },
   logoAccent: { 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
-  nav: { display: 'flex', gap: 8 },
+  nav: { display: 'flex', gap: 'clamp(4px, 1vw, 8px)' },
   navButton: { 
-    padding: '12px 24px', 
+    padding: 'clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 24px)', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
     color: '#888', 
     cursor: 'pointer', 
-    fontSize: 14,
+    fontSize: 'clamp(11px, 1.5vw, 14px)',
     fontWeight: 500,
-    backdropFilter: 'blur(10px)'
+    backdropFilter: 'blur(10px)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
   },
   navButtonActive: { 
-    padding: '12px 24px', 
+    padding: 'clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 24px)', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
     cursor: 'pointer', 
-    fontSize: 14, 
+    fontSize: 'clamp(11px, 1.5vw, 14px)', 
     fontWeight: 600,
-    boxShadow: '0 4px 20px rgba(0,210,211,0.4)'
+    boxShadow: '0 4px 20px rgba(0,210,211,0.4)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6
+  },
+  navIcon: {
+    fontSize: 'clamp(14px, 2vw, 16px)'
+  },
+  navLabel: {
+    display: 'none'
   },
   userInfo: { 
     display: 'flex', 
     alignItems: 'center', 
-    gap: 16, 
+    gap: 'clamp(8px, 1.5vw, 16px)', 
     cursor: 'pointer',
-    padding: '8px 16px',
+    padding: 'clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 16px)',
     borderRadius: 16,
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)'
   },
   balanceBox: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
-  balanceLabel: { fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
+  balanceLabel: { fontSize: 'clamp(9px, 1.2vw, 11px)', color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
   balanceValue: { 
-    fontSize: 18, 
+    fontSize: 'clamp(13px, 2vw, 18px)', 
     fontWeight: 700, 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
   avatar: { 
-    width: 44, 
-    height: 44, 
+    width: 'clamp(32px, 5vw, 44px)', 
+    height: 'clamp(32px, 5vw, 44px)', 
     borderRadius: '50%', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center', 
     fontWeight: 700,
-    fontSize: 18,
+    fontSize: 'clamp(14px, 2vw, 18px)',
     border: '2px solid rgba(0,210,211,0.3)'
   },
   loginBtn: { 
-    padding: '12px 28px', 
+    padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 28px)', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
     cursor: 'pointer', 
     fontWeight: 600,
-    fontSize: 15
+    fontSize: 'clamp(12px, 1.5vw, 15px)'
   },
-  main: { maxWidth: 1200, margin: '0 auto', padding: '40px 20px', position: 'relative', zIndex: 1 },
-  hero: { textAlign: 'center', marginBottom: 48 },
+  main: { maxWidth: 1200, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 2vw, 20px)', position: 'relative', zIndex: 1 },
+  hero: { textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' },
   heroTitle: { 
-    fontSize: 56, 
+    fontSize: 'clamp(28px, 6vw, 56px)', 
     fontWeight: 900, 
     marginBottom: 16, 
     fontFamily: "'Orbitron', sans-serif",
     background: 'linear-gradient(135deg, #fff 0%, #00d2d3 50%, #667eea 100%)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent',
-    textShadow: '0 0 60px rgba(0,210,211,0.3)'
+    textShadow: '0 0 60px rgba(0,210,211,0.3)',
+    lineHeight: 1.1
   },
-  heroSubtitle: { fontSize: 18, color: '#888', maxWidth: 500, margin: '0 auto' },
-  categories: { display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' },
+  heroSubtitle: { fontSize: 'clamp(14px, 2vw, 18px)', color: '#888', maxWidth: 500, margin: '0 auto', padding: '0 10px' },
+  categories: { display: 'flex', gap: 'clamp(6px, 1vw, 12px)', marginBottom: 'clamp(20px, 4vw, 32px)', flexWrap: 'wrap', justifyContent: 'center' },
   category: { 
-    padding: '12px 24px', 
+    padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 2.5vw, 24px)', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 24, 
     color: '#888', 
     cursor: 'pointer', 
-    fontSize: 14,
+    fontSize: 'clamp(11px, 1.5vw, 14px)',
     backdropFilter: 'blur(10px)'
   },
   categoryActive: { 
-    padding: '12px 24px', 
+    padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 2.5vw, 24px)', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 24, 
     color: '#fff', 
     cursor: 'pointer', 
-    fontSize: 14, 
+    fontSize: 'clamp(11px, 1.5vw, 14px)', 
     fontWeight: 600,
     boxShadow: '0 4px 20px rgba(0,210,211,0.4)'
   },
-  marketsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 },
+  marketsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 'clamp(12px, 2vw, 24px)' },
   marketCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 20, 
-    padding: 24, 
+    borderRadius: 'clamp(14px, 2vw, 20px)', 
+    padding: 'clamp(16px, 3vw, 24px)', 
     position: 'relative',
     backdropFilter: 'blur(10px)'
   },
   trendingBadge: { 
     position: 'absolute', 
-    top: 16, 
-    right: 16, 
+    top: 'clamp(10px, 2vw, 16px)', 
+    right: 'clamp(10px, 2vw, 16px)', 
     background: 'linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,107,107,0.1))', 
-    padding: '6px 12px', 
+    padding: '4px 10px', 
     borderRadius: 12, 
-    fontSize: 12,
+    fontSize: 'clamp(10px, 1.3vw, 12px)',
     border: '1px solid rgba(255,107,107,0.3)'
   },
-  marketCategory: { fontSize: 12, color: '#00d2d3', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, fontWeight: 600 },
-  marketQuestion: { fontSize: 18, fontWeight: 600, marginBottom: 20, lineHeight: 1.4 },
-  oddsBar: { display: 'flex', borderRadius: 10, overflow: 'hidden', fontSize: 12, fontWeight: 600, marginBottom: 16 },
-  yesBar: { background: 'linear-gradient(135deg, #00d2d3, #0abde3)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
-  noBar: { background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
-  marketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#666', marginBottom: 20 },
+  marketCategory: { fontSize: 'clamp(10px, 1.3vw, 12px)', color: '#00d2d3', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 'clamp(8px, 1.5vw, 12px)', fontWeight: 600 },
+  marketQuestion: { fontSize: 'clamp(15px, 2vw, 18px)', fontWeight: 600, marginBottom: 'clamp(14px, 2.5vw, 20px)', lineHeight: 1.4 },
+  oddsBar: { display: 'flex', borderRadius: 10, overflow: 'hidden', fontSize: 'clamp(10px, 1.3vw, 12px)', fontWeight: 600, marginBottom: 'clamp(12px, 2vw, 16px)' },
+  yesBar: { background: 'linear-gradient(135deg, #00d2d3, #0abde3)', padding: 'clamp(8px, 1.5vw, 12px)', textAlign: 'center', transition: 'width 0.5s ease' },
+  noBar: { background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', padding: 'clamp(8px, 1.5vw, 12px)', textAlign: 'center', transition: 'width 0.5s ease' },
+  marketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 'clamp(11px, 1.4vw, 13px)', color: '#666', marginBottom: 'clamp(14px, 2.5vw, 20px)' },
   betButton: { 
     width: '100%', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 15, 
+    fontSize: 'clamp(13px, 1.7vw, 15px)', 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
@@ -1149,12 +1197,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center', 
-    zIndex: 1000 
+    zIndex: 1000,
+    padding: 16
   },
   modal: { 
     background: 'linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95))', 
-    borderRadius: 24, 
-    padding: 32, 
+    borderRadius: 'clamp(16px, 3vw, 24px)', 
+    padding: 'clamp(20px, 4vw, 32px)', 
     width: '100%', 
     maxWidth: 440, 
     position: 'relative', 
@@ -1164,19 +1213,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     backdropFilter: 'blur(20px)',
     boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
   },
-  closeModal: { position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#666', fontSize: 28, cursor: 'pointer', transition: 'color 0.2s' },
-  modalTitle: { fontSize: 24, fontWeight: 700, marginBottom: 8 },
-  modalQuestion: { color: '#888', marginBottom: 24, lineHeight: 1.5 },
-  sideSelector: { display: 'flex', gap: 12, marginBottom: 24 },
-  sideYes: { flex: 1, padding: 16, background: 'rgba(0,210,211,0.1)', border: '2px solid rgba(0,210,211,0.3)', borderRadius: 12, color: '#00d2d3', fontSize: 16, fontWeight: 600, cursor: 'pointer' },
-  sideYesActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #00d2d3, #0abde3)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,210,211,0.4)' },
-  sideNo: { flex: 1, padding: 16, background: 'rgba(255,107,107,0.1)', border: '2px solid rgba(255,107,107,0.3)', borderRadius: 12, color: '#ff6b6b', fontSize: 16, fontWeight: 600, cursor: 'pointer' },
-  sideNoActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' },
-  amountSection: { marginBottom: 24 },
-  amountLabel: { display: 'block', marginBottom: 8, color: '#888', fontSize: 14 },
+  closeModal: { position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: '#666', fontSize: 'clamp(24px, 4vw, 28px)', cursor: 'pointer', transition: 'color 0.2s' },
+  modalTitle: { fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 700, marginBottom: 8 },
+  modalQuestion: { color: '#888', marginBottom: 'clamp(16px, 3vw, 24px)', lineHeight: 1.5, fontSize: 'clamp(13px, 1.7vw, 15px)' },
+  sideSelector: { display: 'flex', gap: 'clamp(8px, 1.5vw, 12px)', marginBottom: 'clamp(16px, 3vw, 24px)' },
+  sideYes: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'rgba(0,210,211,0.1)', border: '2px solid rgba(0,210,211,0.3)', borderRadius: 12, color: '#00d2d3', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer' },
+  sideYesActive: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'linear-gradient(135deg, #00d2d3, #0abde3)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,210,211,0.4)' },
+  sideNo: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'rgba(255,107,107,0.1)', border: '2px solid rgba(255,107,107,0.3)', borderRadius: 12, color: '#ff6b6b', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer' },
+  sideNoActive: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' },
+  amountSection: { marginBottom: 'clamp(16px, 3vw, 24px)' },
+  amountLabel: { display: 'block', marginBottom: 8, color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
   input: { 
     width: '100%', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
@@ -1187,206 +1236,206 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'border-color 0.3s, box-shadow 0.3s',
     outline: 'none'
   },
-  quickAmounts: { display: 'flex', gap: 8 },
-  quickAmount: { flex: 1, padding: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#888', fontSize: 12, cursor: 'pointer' },
+  quickAmounts: { display: 'flex', gap: 'clamp(4px, 1vw, 8px)', flexWrap: 'wrap' },
+  quickAmount: { flex: 1, minWidth: 60, padding: 'clamp(8px, 1.2vw, 10px)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#888', fontSize: 'clamp(11px, 1.3vw, 12px)', cursor: 'pointer' },
   potentialWin: { 
     display: 'flex', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     background: 'rgba(0,210,211,0.1)', 
     borderRadius: 12, 
-    marginBottom: 24,
+    marginBottom: 'clamp(16px, 3vw, 24px)',
     border: '1px solid rgba(0,210,211,0.2)'
   },
-  potentialValue: { fontSize: 24, fontWeight: 700, color: '#00d2d3' },
+  potentialValue: { fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 700, color: '#00d2d3' },
   confirmBet: { 
     width: '100%', 
-    padding: 18, 
+    padding: 'clamp(14px, 2.2vw, 18px)', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 16, 
+    fontSize: 'clamp(14px, 1.8vw, 16px)', 
     fontWeight: 700, 
     cursor: 'pointer' 
   },
   authForm: { display: 'flex', flexDirection: 'column', gap: 12 },
-  authSwitch: { textAlign: 'center', color: '#666', marginTop: 16 },
+  authSwitch: { textAlign: 'center', color: '#666', marginTop: 16, fontSize: 'clamp(12px, 1.5vw, 14px)' },
   authLink: { color: '#00d2d3', cursor: 'pointer', fontWeight: 600 },
   walletNotice: { 
     background: 'linear-gradient(135deg, rgba(0,210,211,0.15), rgba(0,210,211,0.05))', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     borderRadius: 12, 
     marginBottom: 16, 
-    fontSize: 14, 
+    fontSize: 'clamp(12px, 1.5vw, 14px)', 
     color: '#00d2d3',
     border: '1px solid rgba(0,210,211,0.2)'
   },
   portfolioSection: { maxWidth: 900, margin: '0 auto' },
   sectionTitle: { 
-    fontSize: 36, 
+    fontSize: 'clamp(24px, 4vw, 36px)', 
     fontWeight: 700, 
-    marginBottom: 32, 
+    marginBottom: 'clamp(20px, 4vw, 32px)', 
     textAlign: 'center',
     fontFamily: "'Orbitron', sans-serif"
   },
-  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 40 },
+  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(10px, 2vw, 20px)', marginBottom: 'clamp(24px, 5vw, 40px)' },
   statCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 20, 
-    padding: 28, 
+    borderRadius: 'clamp(14px, 2vw, 20px)', 
+    padding: 'clamp(16px, 3vw, 28px)', 
     textAlign: 'center',
     backdropFilter: 'blur(10px)'
   },
   statValue: { 
-    fontSize: 28, 
+    fontSize: 'clamp(18px, 3vw, 28px)', 
     fontWeight: 700, 
     marginBottom: 8, 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
-  statLabel: { color: '#666', fontSize: 14 },
-  subsectionTitle: { fontSize: 20, fontWeight: 600, marginBottom: 20 },
-  emptyState: { textAlign: 'center', padding: '60px 20px', color: '#666' },
+  statLabel: { color: '#666', fontSize: 'clamp(11px, 1.5vw, 14px)' },
+  subsectionTitle: { fontSize: 'clamp(16px, 2.5vw, 20px)', fontWeight: 600, marginBottom: 20 },
+  emptyState: { textAlign: 'center', padding: 'clamp(40px, 8vw, 60px) 20px', color: '#666' },
   ctaButton: { 
     marginTop: 20, 
-    padding: '14px 28px', 
+    padding: 'clamp(12px, 1.8vw, 14px) clamp(20px, 3vw, 28px)', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 15, 
+    fontSize: 'clamp(13px, 1.7vw, 15px)', 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
-  betsList: { display: 'flex', flexDirection: 'column', gap: 16 },
+  betsList: { display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vw, 16px)' },
   betCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
     borderRadius: 16, 
-    padding: 20,
+    padding: 'clamp(14px, 2.5vw, 20px)',
     backdropFilter: 'blur(10px)'
   },
   betHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: 12 },
   betSideYes: { background: 'rgba(0,210,211,0.2)', color: '#00d2d3', padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700 },
   betSideNo: { background: 'rgba(255,107,107,0.2)', color: '#ff6b6b', padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700 },
   betStatus: { fontSize: 12, fontWeight: 600 },
-  betQuestion: { marginBottom: 12, lineHeight: 1.4 },
-  betFooter: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: 14 },
+  betQuestion: { marginBottom: 12, lineHeight: 1.4, fontSize: 'clamp(13px, 1.7vw, 15px)' },
+  betFooter: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)', flexWrap: 'wrap', gap: 8 },
   leaderboardSection: { maxWidth: 700, margin: '0 auto' },
-  leaderboardSubtitle: { textAlign: 'center', color: '#666', marginBottom: 32 },
+  leaderboardSubtitle: { textAlign: 'center', color: '#666', marginBottom: 'clamp(20px, 4vw, 32px)', fontSize: 'clamp(13px, 1.7vw, 15px)' },
   leaderboardTable: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 20, 
+    borderRadius: 'clamp(14px, 2vw, 20px)', 
     overflow: 'hidden',
     backdropFilter: 'blur(10px)'
   },
-  leaderboardHeader: { display: 'grid', gridTemplateColumns: '60px 1fr 80px 120px', padding: '16px 20px', background: 'rgba(255,255,255,0.05)', fontSize: 12, color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
+  leaderboardHeader: { display: 'grid', gridTemplateColumns: '40px 1fr 60px 90px', padding: 'clamp(12px, 2vw, 16px) clamp(12px, 2vw, 20px)', background: 'rgba(255,255,255,0.05)', fontSize: 'clamp(10px, 1.3vw, 12px)', color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
   leaderboardRow: { 
     display: 'grid', 
-    gridTemplateColumns: '60px 1fr 80px 120px', 
-    padding: '16px 20px', 
+    gridTemplateColumns: '40px 1fr 60px 90px', 
+    padding: 'clamp(12px, 2vw, 16px) clamp(12px, 2vw, 20px)', 
     borderTop: '1px solid rgba(255,255,255,0.05)', 
     alignItems: 'center',
     transition: 'background 0.3s'
   },
-  lbRank: { fontWeight: 700, fontSize: 16 },
-  lbUser: { fontWeight: 600 },
-  lbBets: { color: '#888' },
-  lbBalance: { color: '#00d2d3', fontWeight: 600 },
-  profileInfo: { textAlign: 'center', marginBottom: 24 },
+  lbRank: { fontWeight: 700, fontSize: 'clamp(14px, 1.8vw, 16px)' },
+  lbUser: { fontWeight: 600, fontSize: 'clamp(12px, 1.5vw, 14px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  lbBets: { color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
+  lbBalance: { color: '#00d2d3', fontWeight: 600, fontSize: 'clamp(12px, 1.5vw, 14px)', textAlign: 'right' },
+  profileInfo: { textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)' },
   profileAvatar: { 
-    width: 80, 
-    height: 80, 
+    width: 'clamp(60px, 10vw, 80px)', 
+    height: 'clamp(60px, 10vw, 80px)', 
     borderRadius: '50%', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center', 
     fontWeight: 700, 
-    fontSize: 32, 
+    fontSize: 'clamp(24px, 4vw, 32px)', 
     margin: '0 auto 16px',
     border: '3px solid rgba(0,210,211,0.3)'
   },
-  profileUsername: { fontSize: 24, fontWeight: 700, marginBottom: 4 },
-  profileEmail: { color: '#666', fontSize: 14 },
+  profileUsername: { fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 700, marginBottom: 4 },
+  profileEmail: { color: '#666', fontSize: 'clamp(12px, 1.5vw, 14px)' },
   walletSection: { 
     background: 'rgba(255,255,255,0.05)', 
     borderRadius: 16, 
-    padding: 20, 
-    marginBottom: 20,
+    padding: 'clamp(14px, 2.5vw, 20px)', 
+    marginBottom: 'clamp(14px, 2.5vw, 20px)',
     border: '1px solid rgba(255,255,255,0.08)'
   },
-  walletTitle: { fontSize: 16, fontWeight: 600, marginBottom: 12 },
-  walletAddress: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 },
-  addressText: { flex: 1, background: 'rgba(0,0,0,0.3)', padding: '12px 14px', borderRadius: 10, fontSize: 13, fontFamily: 'monospace' },
+  walletTitle: { fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, marginBottom: 12 },
+  walletAddress: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' },
+  addressText: { flex: 1, minWidth: 150, background: 'rgba(0,0,0,0.3)', padding: 'clamp(10px, 1.5vw, 12px) 14px', borderRadius: 10, fontSize: 'clamp(11px, 1.4vw, 13px)', fontFamily: 'monospace' },
   copyBtn: { 
-    padding: '12px 18px', 
+    padding: 'clamp(10px, 1.5vw, 12px) clamp(14px, 2vw, 18px)', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 10, 
     color: '#fff', 
-    fontSize: 13, 
+    fontSize: 'clamp(11px, 1.4vw, 13px)', 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
-  walletBalance: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 },
-  solBalance: { fontSize: 20, fontWeight: 700, color: '#00d2d3' },
+  walletBalance: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap' },
+  solBalance: { fontSize: 'clamp(18px, 2.5vw, 20px)', fontWeight: 700, color: '#00d2d3' },
   refreshBtn: { padding: '8px 14px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 16 },
   exportPkBtn: {
     width: '100%',
-    padding: 14,
+    padding: 'clamp(12px, 1.8vw, 14px)',
     background: 'rgba(255,193,7,0.15)',
     border: '1px solid rgba(255,193,7,0.3)',
     borderRadius: 10,
     color: '#ffc107',
-    fontSize: 14,
+    fontSize: 'clamp(12px, 1.5vw, 14px)',
     fontWeight: 600,
     cursor: 'pointer'
   },
   depositSection: { 
     background: 'linear-gradient(135deg, rgba(0,210,211,0.1), rgba(0,210,211,0.05))', 
     borderRadius: 16, 
-    padding: 20, 
-    marginBottom: 20,
+    padding: 'clamp(14px, 2.5vw, 20px)', 
+    marginBottom: 'clamp(14px, 2.5vw, 20px)',
     border: '1px solid rgba(0,210,211,0.2)'
   },
-  depositTitle: { fontSize: 16, fontWeight: 600, marginBottom: 8 },
-  depositText: { color: '#888', fontSize: 14 },
-  withdrawSection: { marginBottom: 20 },
+  depositTitle: { fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, marginBottom: 8 },
+  depositText: { color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
+  withdrawSection: { marginBottom: 'clamp(14px, 2.5vw, 20px)' },
   withdrawBtn: { 
     width: '100%', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 15, 
+    fontSize: 'clamp(13px, 1.7vw, 15px)', 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
   logoutBtn: { 
     width: '100%', 
-    padding: 16, 
+    padding: 'clamp(12px, 2vw, 16px)', 
     background: 'rgba(255,107,107,0.15)', 
     border: '1px solid rgba(255,107,107,0.3)', 
     borderRadius: 12, 
     color: '#ff6b6b', 
-    fontSize: 15, 
+    fontSize: 'clamp(13px, 1.7vw, 15px)', 
     fontWeight: 600, 
     cursor: 'pointer',
     transition: 'all 0.3s'
   },
-  withdrawBalance: { textAlign: 'center', marginBottom: 24, fontSize: 16 },
-  formGroup: { marginBottom: 20, position: 'relative' },
+  withdrawBalance: { textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)', fontSize: 'clamp(14px, 1.8vw, 16px)' },
+  formGroup: { marginBottom: 'clamp(14px, 2.5vw, 20px)', position: 'relative' },
   maxBtn: { position: 'absolute', right: 12, top: 38, padding: '8px 14px', background: 'rgba(0,210,211,0.2)', border: 'none', borderRadius: 8, color: '#00d2d3', fontSize: 12, fontWeight: 600, cursor: 'pointer' },
-  feeNotice: { color: '#888', fontSize: 13, marginBottom: 20, textAlign: 'center' },
+  feeNotice: { color: '#888', fontSize: 'clamp(11px, 1.4vw, 13px)', marginBottom: 20, textAlign: 'center' },
   footer: {
-    marginTop: 80,
+    marginTop: 'clamp(40px, 8vw, 80px)',
     borderTop: '1px solid rgba(255,255,255,0.1)',
     background: 'rgba(10,10,15,0.8)',
     backdropFilter: 'blur(20px)',
@@ -1396,11 +1445,11 @@ const styles: { [key: string]: React.CSSProperties } = {
   footerContent: {
     maxWidth: 1200,
     margin: '0 auto',
-    padding: '60px 20px',
+    padding: 'clamp(30px, 6vw, 60px) clamp(16px, 2vw, 20px)',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
-    gap: 32
+    gap: 'clamp(20px, 4vw, 32px)'
   },
   footerLogo: {
     display: 'flex',
@@ -1408,24 +1457,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: 10
   },
   footerLogoIcon: {
-    fontSize: 32,
+    fontSize: 'clamp(24px, 4vw, 32px)',
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent'
   },
   footerLogoText: {
-    fontSize: 24,
+    fontSize: 'clamp(18px, 3vw, 24px)',
     fontWeight: 700,
     fontFamily: "'Orbitron', sans-serif",
     letterSpacing: '2px'
   },
   footerLinks: {
     display: 'flex',
-    gap: 20
+    gap: 'clamp(12px, 2.5vw, 20px)'
   },
   socialLink: {
-    width: 50,
-    height: 50,
+    width: 'clamp(40px, 6vw, 50px)',
+    height: 'clamp(40px, 6vw, 50px)',
     borderRadius: '50%',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
@@ -1443,10 +1492,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     gap: 12,
     width: '100%',
-    maxWidth: 500
+    maxWidth: 500,
+    padding: '0 10px'
   },
   contractLabel: {
-    fontSize: 12,
+    fontSize: 'clamp(10px, 1.3vw, 12px)',
     fontWeight: 700,
     color: '#00d2d3',
     letterSpacing: '2px',
@@ -1455,45 +1505,46 @@ const styles: { [key: string]: React.CSSProperties } = {
   contractBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
+    gap: 'clamp(8px, 1.5vw, 12px)',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 12,
-    padding: '12px 16px',
+    padding: 'clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px)',
     width: '100%'
   },
   contractAddress: {
     flex: 1,
     fontFamily: 'monospace',
-    fontSize: 13,
+    fontSize: 'clamp(10px, 1.3vw, 13px)',
     color: '#888',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap' as const
   },
   contractCopyBtn: {
-    padding: '8px 16px',
+    padding: 'clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px)',
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)',
     border: 'none',
     borderRadius: 8,
     color: '#fff',
-    fontSize: 12,
+    fontSize: 'clamp(10px, 1.3vw, 12px)',
     fontWeight: 600,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    whiteSpace: 'nowrap' as const
   },
   footerBottom: {
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     gap: 8,
-    marginTop: 20
+    marginTop: 'clamp(10px, 2vw, 20px)'
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 'clamp(11px, 1.4vw, 13px)',
     color: '#666'
   },
   footerTextHighlight: {
-    fontSize: 13,
+    fontSize: 'clamp(11px, 1.4vw, 13px)',
     color: '#00d2d3',
     fontWeight: 600
   }

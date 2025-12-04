@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -71,6 +70,12 @@ export default function Home() {
     setMounted(true)
     fetchMarkets()
     fetchLeaderboard()
+    
+    // Check for saved user session
+    const savedUserId = localStorage.getItem('polygens_user_id')
+    if (savedUserId) {
+      fetchUser(savedUserId)
+    }
   }, [])
 
   const fetchMarkets = async () => {
@@ -86,9 +91,17 @@ export default function Home() {
   }
 
   const fetchUser = async (userId: string) => {
-    const res = await fetch(`/api/user?id=${userId}`)
-    const data = await res.json()
-    setUser(data)
+    try {
+      const res = await fetch(`/api/user?id=${userId}`)
+      const data = await res.json()
+      if (res.ok && data.id) {
+        setUser(data)
+      } else {
+        localStorage.removeItem('polygens_user_id')
+      }
+    } catch (error) {
+      localStorage.removeItem('polygens_user_id')
+    }
   }
 
   const showNotif = (message: string, type = 'success') => {
@@ -112,6 +125,7 @@ export default function Home() {
 
     if (res.ok) {
       setUser({ ...data, bets: [] })
+      localStorage.setItem('polygens_user_id', data.id)
       setShowAuthModal(false)
       setAuthForm({ email: '', username: '', password: '' })
       showNotif(isLogin ? 'Welcome back!' : 'Account created! Your Solana wallet is ready.')
@@ -222,6 +236,13 @@ export default function Home() {
     } else {
       showNotif(data.error, 'error')
     }
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('polygens_user_id')
+    setShowProfileModal(false)
+    showNotif('Logged out')
   }
 
   const filteredMarkets = selectedCategory === 'All'
@@ -957,7 +978,7 @@ export default function Home() {
 
               <button 
                 style={styles.logoutBtn} 
-                onClick={() => { setUser(null); setShowProfileModal(false); showNotif('Logged out'); }}
+                onClick={handleLogout}
               >
                 Logout
               </button>

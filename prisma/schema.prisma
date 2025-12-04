@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  username          String   @unique
+  password          String
+  solanaAddress     String?
+  solanaPrivateKey  String?
+  solBalance        Float    @default(0)
+  createdAt         DateTime @default(now())
+  bets              Bet[]
+}
+
+model Market {
+  id        String   @id @default(cuid())
+  question  String
+  category  String
+  yesOdds   Int      @default(50)
+  volume    Float    @default(0)
+  endDate   DateTime
+  resolved  Boolean  @default(false)
+  outcome   Boolean?
+  trending  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  bets      Bet[]
+}
+
+model Bet {
+  id           String   @id @default(cuid())
+  amount       Float
+  side         String
+  potentialWin Float
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  market       Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId     String
+}

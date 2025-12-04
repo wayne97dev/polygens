@@ -1,3 +1,4 @@
+
 import { prisma } from '@/lib/prisma'
 import { getBalance } from '@/lib/solana'
 import { transferToTreasury } from '@/lib/treasury'
@@ -6,6 +7,8 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   try {
     const { userId, marketId, amount, side } = await request.json()
+
+    console.log('Bet request:', { userId, marketId, amount, side })
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
     const market = await prisma.market.findUnique({ where: { id: marketId } })
@@ -27,7 +30,7 @@ export async function POST(request: Request) {
     // Check real on-chain balance
     const realBalance = await getBalance(user.solanaAddress)
     
-    if (realBalance < amount + 0.001) { // +0.001 for fees
+    if (realBalance < amount + 0.001) {
       return NextResponse.json(
         { error: `Insufficient balance. You have ${realBalance.toFixed(4)} SOL` },
         { status: 400 }
@@ -41,6 +44,12 @@ export async function POST(request: Request) {
       )
     }
 
+    // Calculate odds and potential win BEFORE transfer
+    const odds = side === 'yes' ? market.yesOdds : 100 - market.yesOdds
+    const potentialWin = amount * (100 / odds)
+
+    console.log('Calculated odds:', odds, 'Potential win:', potentialWin)
+
     // Transfer SOL to treasury
     const transfer = await transferToTreasury(user.solanaPrivateKey, amount)
     
@@ -51,14 +60,12 @@ export async function POST(request: Request) {
       )
     }
 
-    const odds = side === 'yes' ? market.yesOdds : 100 - market.yesOdds
-    const potentialWin = amount * (100 / odds)
+    console.log('Transfer successful:', transfer.signature)
 
-    // Update database
-    const newBalance = await getBalance(user.solanaAddress)
-    
-    const [bet] = await prisma.$transaction([
-      prisma.bet.create({
+    // Create bet FIRST, separately
+    let bet
+    try {
+      bet = await prisma.bet.create({
         data: {
           userId,
           marketId,
@@ -67,12 +74,26 @@ export async function POST(request: Request) {
           potentialWin,
           status: 'active'
         }
-      }),
-      prisma.user.update({
+      })
+      console.log('Bet created:', bet.id)
+    } catch (betError) {
+      console.error('Bet creation error:', betError)
+      return NextResponse.json(
+        { error: 'Bet creation failed but transfer completed. Contact support.' },
+        { status: 500 }
+      )
+    }
+
+    // Update user balance and market
+    try {
+      const newBalance = await getBalance(user.solanaAddress)
+      
+      await prisma.user.update({
         where: { id: userId },
         data: { solBalance: newBalance }
-      }),
-      prisma.market.update({
+      })
+
+      await prisma.market.update({
         where: { id: marketId },
         data: { 
           volume: market.volume + amount,
@@ -81,7 +102,10 @@ export async function POST(request: Request) {
             : Math.max(market.yesOdds - 1, 5)
         }
       })
-    ])
+      console.log('User and market updated')
+    } catch (updateError) {
+      console.error('Update error (bet was created):', updateError)
+    }
 
     return NextResponse.json({
       ...bet,
@@ -90,7 +114,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Bet error:', error)
     return NextResponse.json(
-      { error: 'Something went wrong' },
+      { error: 'Something went wrong: ' + (error instanceof Error ? error.message : 'Unknown error') },
       { status: 500 }
     )
   }

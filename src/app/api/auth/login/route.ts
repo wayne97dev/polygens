@@ -26,12 +26,13 @@ export async function POST(request: Request) {
       )
     }
 
-    return NextResponse.json({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      balance: user.balance
-    })
+   return NextResponse.json({
+  id: user.id,
+  email: user.email,
+  username: user.username,
+  solBalance: user.solBalance,
+  solanaAddress: user.solanaAddress
+})
   } catch (error) {
     return NextResponse.json(
       { error: 'Something went wrong' },

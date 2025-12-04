@@ -603,7 +603,7 @@ export default function Home() {
                     </div>
 
                     <div style={styles.marketMeta}>
-                      <span>📊 {market.volume.toFixed(2)} SOL</span>
+                      <span>📊 {market.volume.toFixed(4)} SOL</span>
                       <span>⏰ {new Date(market.endDate).toLocaleDateString()}</span>
                     </div>
 

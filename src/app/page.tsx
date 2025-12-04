@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -60,7 +61,6 @@ export default function Home() {
 
   const categories = ['All', 'Crypto', 'Tech', 'Finance', 'Politics', 'Sports']
   
-  // CONFIGURA QUI I TUOI LINK E CONTRATTO
   const CONFIG = {
     xLink: 'https://x.com/YOUR_X_HANDLE',
     dexscreenerLink: 'https://dexscreener.com/solana/YOUR_TOKEN_ADDRESS',
@@ -235,10 +235,12 @@ export default function Home() {
         
         * {
           box-sizing: border-box;
+          -webkit-tap-highlight-color: transparent;
         }
         
         body {
           margin: 0;
+          padding: 0;
           overflow-x: hidden;
         }
         
@@ -357,6 +359,125 @@ export default function Home() {
           .nav-btn:hover {
             transform: none !important;
           }
+          .social-hover:hover {
+            transform: none !important;
+          }
+          .mobile-header {
+            flex-wrap: wrap !important;
+            padding: 12px !important;
+            gap: 10px !important;
+          }
+          .mobile-nav {
+            order: 3 !important;
+            width: 100% !important;
+            justify-content: center !important;
+            gap: 6px !important;
+          }
+          .mobile-nav button {
+            padding: 10px 16px !important;
+            font-size: 12px !important;
+          }
+          .mobile-hide-text {
+            display: none !important;
+          }
+          .mobile-logo-text {
+            font-size: 20px !important;
+          }
+          .mobile-logo-icon {
+            font-size: 28px !important;
+          }
+          .mobile-user-info {
+            padding: 6px 10px !important;
+            gap: 8px !important;
+          }
+          .mobile-avatar {
+            width: 34px !important;
+            height: 34px !important;
+            font-size: 14px !important;
+          }
+          .mobile-balance {
+            font-size: 13px !important;
+          }
+          .mobile-hero-title {
+            font-size: 32px !important;
+            line-height: 1.1 !important;
+          }
+          .mobile-hero-subtitle {
+            font-size: 14px !important;
+            padding: 0 10px !important;
+          }
+          .mobile-main {
+            padding: 20px 12px !important;
+          }
+          .mobile-section-title {
+            font-size: 24px !important;
+          }
+          .mobile-stats-row {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .mobile-stat-card {
+            padding: 20px !important;
+          }
+          .mobile-stat-value {
+            font-size: 24px !important;
+          }
+          .mobile-leaderboard-header,
+          .mobile-leaderboard-row {
+            grid-template-columns: 35px 1fr 70px !important;
+            padding: 12px !important;
+            font-size: 13px !important;
+          }
+          .mobile-lb-bets {
+            display: none !important;
+          }
+          .mobile-footer {
+            padding: 30px 16px !important;
+            gap: 20px !important;
+          }
+          .mobile-contract-box {
+            flex-direction: column !important;
+            gap: 10px !important;
+            padding: 14px !important;
+          }
+          .mobile-contract-address {
+            font-size: 11px !important;
+            text-align: center !important;
+            white-space: normal !important;
+            word-break: break-all !important;
+          }
+          .mobile-modal {
+            margin: 12px !important;
+            padding: 20px !important;
+            max-height: 90vh !important;
+            border-radius: 16px !important;
+          }
+          .mobile-modal-title {
+            font-size: 20px !important;
+          }
+          .mobile-quick-amounts {
+            flex-wrap: wrap !important;
+          }
+          .mobile-quick-amounts button {
+            flex: 1 1 45% !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .mobile-nav button {
+            padding: 8px 12px !important;
+            font-size: 11px !important;
+          }
+          .mobile-hero-title {
+            font-size: 26px !important;
+          }
+          .mobile-categories {
+            gap: 6px !important;
+          }
+          .mobile-categories button {
+            padding: 8px 12px !important;
+            font-size: 11px !important;
+          }
         }
       `}</style>
       
@@ -371,11 +492,11 @@ export default function Home() {
           <div style={styles.noiseOverlay} />
         </div>
 
-        {/* Floating Particles - Hidden on mobile */}
+        {/* Floating Particles */}
         {mounted && [...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="animate-float hidden-mobile"
+            className="animate-float"
             style={{
               ...styles.particle,
               left: `${10 + i * 15}%`,
@@ -401,13 +522,13 @@ export default function Home() {
         )}
 
         {/* Header */}
-        <header style={styles.header}>
+        <header style={styles.header} className="mobile-header">
           <div style={styles.logo}>
-            <span className="animate-glow" style={styles.logoIcon}>◈</span>
-            <span style={styles.logoText}>POLY<span style={styles.logoAccent}>GENS</span></span>
+            <span className="animate-glow mobile-logo-icon" style={styles.logoIcon}>◈</span>
+            <span style={styles.logoText} className="mobile-logo-text">POLY<span style={styles.logoAccent}>GENS</span></span>
           </div>
           
-          <nav style={styles.nav}>
+          <nav style={styles.nav} className="mobile-nav">
             {['markets', 'portfolio', 'leaderboard'].map(tab => (
               <button
                 key={tab}
@@ -415,21 +536,19 @@ export default function Home() {
                 style={activeTab === tab ? styles.navButtonActive : styles.navButton}
                 onClick={() => setActiveTab(tab)}
               >
-                <span style={styles.navIcon}>
-                  {tab === 'markets' ? '📊' : tab === 'portfolio' ? '💼' : '🏆'}
-                </span>
-                <span style={styles.navLabel}>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+                <span>{tab === 'markets' ? '📊' : tab === 'portfolio' ? '💼' : '🏆'}</span>
+                <span className="mobile-hide-text">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
               </button>
             ))}
           </nav>
 
           {user ? (
-            <div style={styles.userInfo} onClick={() => setShowProfileModal(true)} className="card-hover">
+            <div style={styles.userInfo} onClick={() => setShowProfileModal(true)} className="card-hover mobile-user-info">
               <div style={styles.balanceBox}>
                 <span style={styles.balanceLabel}>Balance</span>
-                <span style={styles.balanceValue}>{(user.solBalance || 0).toFixed(4)} SOL</span>
+                <span style={styles.balanceValue} className="mobile-balance">{(user.solBalance || 0).toFixed(4)} SOL</span>
               </div>
-              <div className="animate-border-glow" style={styles.avatar}>{user.username.charAt(0).toUpperCase()}</div>
+              <div className="animate-border-glow mobile-avatar" style={styles.avatar}>{user.username.charAt(0).toUpperCase()}</div>
             </div>
           ) : (
             <button className="btn-hover" style={styles.loginBtn} onClick={() => setShowAuthModal(true)}>
@@ -439,15 +558,15 @@ export default function Home() {
         </header>
 
         {/* Main Content */}
-        <main style={styles.main}>
+        <main style={styles.main} className="mobile-main">
           {activeTab === 'markets' && (
             <>
               <div style={styles.hero} className="stagger-1">
-                <h1 style={styles.heroTitle}>Predict the Future</h1>
-                <p style={styles.heroSubtitle}>Bet with SOL on events that matter. Earn crypto with your predictions.</p>
+                <h1 style={styles.heroTitle} className="mobile-hero-title">Predict the Future</h1>
+                <p style={styles.heroSubtitle} className="mobile-hero-subtitle">Bet with SOL on events that matter. Earn crypto with your predictions.</p>
               </div>
 
-              <div style={styles.categories} className="stagger-2">
+              <div style={styles.categories} className="stagger-2 mobile-categories">
                 {categories.map(cat => (
                   <button
                     key={cat}
@@ -510,7 +629,7 @@ export default function Home() {
 
           {activeTab === 'portfolio' && (
             <div style={styles.portfolioSection}>
-              <h2 style={styles.sectionTitle} className="stagger-1">Your Portfolio</h2>
+              <h2 style={styles.sectionTitle} className="stagger-1 mobile-section-title">Your Portfolio</h2>
               
               {!user ? (
                 <div style={styles.emptyState} className="stagger-2">
@@ -521,14 +640,14 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  <div style={styles.statsRow}>
+                  <div style={styles.statsRow} className="mobile-stats-row">
                     {[
                       { value: `${(user.solBalance || 0).toFixed(4)} SOL`, label: 'Current Balance' },
                       { value: user.bets?.length || 0, label: 'Active Bets' },
                       { value: `${(user.bets?.reduce((sum, b) => sum + b.potentialWin, 0) || 0).toFixed(4)} SOL`, label: 'Potential Winnings' }
                     ].map((stat, i) => (
-                      <div key={i} className="card-hover" style={{...styles.statCard, animation: `slideUp 0.6s ease-out ${0.2 + i * 0.1}s both`}}>
-                        <div style={styles.statValue}>{stat.value}</div>
+                      <div key={i} className="card-hover mobile-stat-card" style={{...styles.statCard, animation: `slideUp 0.6s ease-out ${0.2 + i * 0.1}s both`}}>
+                        <div style={styles.statValue} className="mobile-stat-value">{stat.value}</div>
                         <div style={styles.statLabel}>{stat.label}</div>
                       </div>
                     ))}
@@ -577,7 +696,7 @@ export default function Home() {
 
           {activeTab === 'leaderboard' && (
             <div style={styles.leaderboardSection}>
-              <h2 style={styles.sectionTitle} className="stagger-1">🏆 Global Leaderboard</h2>
+              <h2 style={styles.sectionTitle} className="stagger-1 mobile-section-title">🏆 Global Leaderboard</h2>
               <p style={styles.leaderboardSubtitle} className="stagger-2">Top predictors on the platform</p>
               
               {leaderboard.length === 0 ? (
@@ -589,16 +708,16 @@ export default function Home() {
                 </div>
               ) : (
                 <div style={styles.leaderboardTable} className="stagger-3">
-                  <div style={styles.leaderboardHeader}>
+                  <div style={styles.leaderboardHeader} className="mobile-leaderboard-header">
                     <span style={styles.lbRank}>#</span>
                     <span style={styles.lbUser}>User</span>
-                    <span style={styles.lbBets}>Bets</span>
+                    <span style={styles.lbBets} className="mobile-lb-bets">Bets</span>
                     <span style={styles.lbBalance}>Balance</span>
                   </div>
                   {leaderboard.map((player, index) => (
                     <div 
                       key={player.rank}
-                      className="card-hover"
+                      className="card-hover mobile-leaderboard-row"
                       style={{
                         ...styles.leaderboardRow,
                         background: player.rank <= 3 
@@ -609,7 +728,7 @@ export default function Home() {
                     >
                       <span style={styles.lbRank}>{player.badge || player.rank}</span>
                       <span style={styles.lbUser}>{player.username}</span>
-                      <span style={styles.lbBets}>{player.totalBets}</span>
+                      <span style={styles.lbBets} className="mobile-lb-bets">{player.totalBets}</span>
                       <span style={styles.lbBalance}>{(player.solBalance || 0).toFixed(4)} SOL</span>
                     </div>
                   ))}
@@ -621,14 +740,13 @@ export default function Home() {
 
         {/* Footer */}
         <footer style={styles.footer}>
-          <div style={styles.footerContent}>
+          <div style={styles.footerContent} className="mobile-footer">
             <div style={styles.footerLogo}>
               <span style={styles.footerLogoIcon}>◈</span>
               <span style={styles.footerLogoText}>POLY<span style={styles.logoAccent}>GENS</span></span>
             </div>
             
             <div style={styles.footerLinks}>
-              {/* X (Twitter) */}
               <a 
                 href={CONFIG.xLink}
                 target="_blank" 
@@ -641,7 +759,6 @@ export default function Home() {
                 </svg>
               </a>
               
-              {/* Dexscreener */}
               <a 
                 href={CONFIG.dexscreenerLink}
                 target="_blank" 
@@ -657,8 +774,8 @@ export default function Home() {
 
             <div style={styles.contractSection}>
               <span style={styles.contractLabel}>CONTRACT</span>
-              <div style={styles.contractBox}>
-                <span style={styles.contractAddress}>{CONFIG.contractAddress}</span>
+              <div style={styles.contractBox} className="mobile-contract-box">
+                <span style={styles.contractAddress} className="mobile-contract-address">{CONFIG.contractAddress}</span>
                 <button 
                   className="btn-hover"
                   style={styles.contractCopyBtn}
@@ -679,9 +796,9 @@ export default function Home() {
         {/* Bet Modal */}
         {showBetModal && selectedMarket && (
           <div style={styles.modalOverlay} onClick={() => setShowBetModal(false)}>
-            <div className="modal-enter" style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
               <button style={styles.closeModal} onClick={() => setShowBetModal(false)}>×</button>
-              <h2 style={styles.modalTitle}>Place Your Bet</h2>
+              <h2 style={styles.modalTitle} className="mobile-modal-title">Place Your Bet</h2>
               <p style={styles.modalQuestion}>{selectedMarket.question}</p>
               
               <div style={styles.sideSelector}>
@@ -710,7 +827,7 @@ export default function Home() {
                   onChange={e => setBetAmount(Math.max(0, parseFloat(e.target.value) || 0))}
                   style={styles.input}
                 />
-                <div style={styles.quickAmounts}>
+                <div style={styles.quickAmounts} className="mobile-quick-amounts">
                   {[0.05, 0.1, 0.25, 0.5].map(amount => (
                     <button key={amount} className="nav-btn" style={styles.quickAmount} onClick={() => setBetAmount(amount)}>
                       {amount} SOL
@@ -734,9 +851,9 @@ export default function Home() {
         {/* Auth Modal */}
         {showAuthModal && (
           <div style={styles.modalOverlay} onClick={() => setShowAuthModal(false)}>
-            <div className="modal-enter" style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
               <button style={styles.closeModal} onClick={() => setShowAuthModal(false)}>×</button>
-              <h2 style={styles.modalTitle}>{isLogin ? 'Sign In' : 'Create Account'}</h2>
+              <h2 style={styles.modalTitle} className="mobile-modal-title">{isLogin ? 'Sign In' : 'Create Account'}</h2>
               
               {!isLogin && (
                 <p className="animate-shimmer" style={styles.walletNotice}>
@@ -785,9 +902,9 @@ export default function Home() {
         {/* Profile Modal */}
         {showProfileModal && user && (
           <div style={styles.modalOverlay} onClick={() => setShowProfileModal(false)}>
-            <div className="modal-enter" style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
               <button style={styles.closeModal} onClick={() => setShowProfileModal(false)}>×</button>
-              <h2 style={styles.modalTitle}>Your Profile</h2>
+              <h2 style={styles.modalTitle} className="mobile-modal-title">Your Profile</h2>
               
               <div style={styles.profileInfo}>
                 <div className="animate-border-glow" style={styles.profileAvatar}>{user.username.charAt(0).toUpperCase()}</div>
@@ -851,9 +968,9 @@ export default function Home() {
         {/* Withdraw Modal */}
         {showWithdrawModal && user && (
           <div style={styles.modalOverlay} onClick={() => setShowWithdrawModal(false)}>
-            <div className="modal-enter" style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
               <button style={styles.closeModal} onClick={() => setShowWithdrawModal(false)}>×</button>
-              <h2 style={styles.modalTitle}>Withdraw SOL</h2>
+              <h2 style={styles.modalTitle} className="mobile-modal-title">Withdraw SOL</h2>
               
               <p style={styles.withdrawBalance}>
                 Available: <strong>{(user.solBalance || 0).toFixed(4)} SOL</strong>
@@ -901,9 +1018,6 @@ export default function Home() {
     </>
   )
 }
-
-// Funzione helper per valori responsive
-const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
 
 const styles: { [key: string]: React.CSSProperties } = {
   container: { 
@@ -992,197 +1106,185 @@ const styles: { [key: string]: React.CSSProperties } = {
   notification: { 
     position: 'fixed', 
     top: 20, 
-    left: '50%',
-    transform: 'translateX(-50%)',
-    padding: '12px 20px', 
+    right: 20, 
+    padding: '16px 24px', 
     borderRadius: 12, 
     color: '#fff', 
     fontWeight: 600, 
     zIndex: 1000,
     backdropFilter: 'blur(10px)',
     border: '1px solid rgba(255,255,255,0.1)',
-    fontSize: 14,
-    maxWidth: '90%',
-    textAlign: 'center'
+    maxWidth: '90%'
   },
   header: { 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
-    padding: 'clamp(10px, 2vw, 20px) clamp(12px, 3vw, 40px)', 
+    padding: '20px 40px', 
     borderBottom: '1px solid rgba(255,255,255,0.1)', 
     background: 'rgba(10,10,15,0.7)', 
     backdropFilter: 'blur(20px)',
     position: 'sticky', 
     top: 0, 
-    zIndex: 100,
-    gap: 8,
-    flexWrap: 'wrap' as const
+    zIndex: 100 
   },
-  logo: { display: 'flex', alignItems: 'center', gap: 'clamp(4px, 1vw, 10px)' },
+  logo: { display: 'flex', alignItems: 'center', gap: 10 },
   logoIcon: { 
-    fontSize: 'clamp(24px, 4vw, 36px)', 
+    fontSize: 36, 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent',
     filter: 'drop-shadow(0 0 10px rgba(0,210,211,0.5))'
   },
   logoText: { 
-    fontSize: 'clamp(16px, 3vw, 26px)', 
+    fontSize: 26, 
     fontWeight: 700,
     fontFamily: "'Orbitron', sans-serif",
-    letterSpacing: 'clamp(1px, 0.3vw, 2px)'
+    letterSpacing: '2px'
   },
   logoAccent: { 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
-  nav: { display: 'flex', gap: 'clamp(4px, 1vw, 8px)' },
+  nav: { display: 'flex', gap: 8 },
   navButton: { 
-    padding: 'clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 24px)', 
+    padding: '12px 24px', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
     color: '#888', 
     cursor: 'pointer', 
-    fontSize: 'clamp(11px, 1.5vw, 14px)',
+    fontSize: 14,
     fontWeight: 500,
     backdropFilter: 'blur(10px)',
     display: 'flex',
     alignItems: 'center',
-    gap: 6
+    gap: 8
   },
   navButtonActive: { 
-    padding: 'clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 24px)', 
+    padding: '12px 24px', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
     cursor: 'pointer', 
-    fontSize: 'clamp(11px, 1.5vw, 14px)', 
+    fontSize: 14, 
     fontWeight: 600,
     boxShadow: '0 4px 20px rgba(0,210,211,0.4)',
     display: 'flex',
     alignItems: 'center',
-    gap: 6
-  },
-  navIcon: {
-    fontSize: 'clamp(14px, 2vw, 16px)'
-  },
-  navLabel: {
-    display: 'none'
+    gap: 8
   },
   userInfo: { 
     display: 'flex', 
     alignItems: 'center', 
-    gap: 'clamp(8px, 1.5vw, 16px)', 
+    gap: 16, 
     cursor: 'pointer',
-    padding: 'clamp(6px, 1vw, 8px) clamp(8px, 1.5vw, 16px)',
+    padding: '8px 16px',
     borderRadius: 16,
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)'
   },
   balanceBox: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
-  balanceLabel: { fontSize: 'clamp(9px, 1.2vw, 11px)', color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
+  balanceLabel: { fontSize: 11, color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
   balanceValue: { 
-    fontSize: 'clamp(13px, 2vw, 18px)', 
+    fontSize: 18, 
     fontWeight: 700, 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
   avatar: { 
-    width: 'clamp(32px, 5vw, 44px)', 
-    height: 'clamp(32px, 5vw, 44px)', 
+    width: 44, 
+    height: 44, 
     borderRadius: '50%', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center', 
     fontWeight: 700,
-    fontSize: 'clamp(14px, 2vw, 18px)',
+    fontSize: 18,
     border: '2px solid rgba(0,210,211,0.3)'
   },
   loginBtn: { 
-    padding: 'clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 28px)', 
+    padding: '12px 28px', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
     cursor: 'pointer', 
     fontWeight: 600,
-    fontSize: 'clamp(12px, 1.5vw, 15px)'
+    fontSize: 15
   },
-  main: { maxWidth: 1200, margin: '0 auto', padding: 'clamp(16px, 4vw, 40px) clamp(12px, 2vw, 20px)', position: 'relative', zIndex: 1 },
-  hero: { textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' },
+  main: { maxWidth: 1200, margin: '0 auto', padding: '40px 20px', position: 'relative', zIndex: 1 },
+  hero: { textAlign: 'center', marginBottom: 48 },
   heroTitle: { 
-    fontSize: 'clamp(28px, 6vw, 56px)', 
+    fontSize: 56, 
     fontWeight: 900, 
     marginBottom: 16, 
     fontFamily: "'Orbitron', sans-serif",
     background: 'linear-gradient(135deg, #fff 0%, #00d2d3 50%, #667eea 100%)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent',
-    textShadow: '0 0 60px rgba(0,210,211,0.3)',
-    lineHeight: 1.1
+    textShadow: '0 0 60px rgba(0,210,211,0.3)'
   },
-  heroSubtitle: { fontSize: 'clamp(14px, 2vw, 18px)', color: '#888', maxWidth: 500, margin: '0 auto', padding: '0 10px' },
-  categories: { display: 'flex', gap: 'clamp(6px, 1vw, 12px)', marginBottom: 'clamp(20px, 4vw, 32px)', flexWrap: 'wrap', justifyContent: 'center' },
+  heroSubtitle: { fontSize: 18, color: '#888', maxWidth: 500, margin: '0 auto' },
+  categories: { display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' },
   category: { 
-    padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 2.5vw, 24px)', 
+    padding: '12px 24px', 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 24, 
     color: '#888', 
     cursor: 'pointer', 
-    fontSize: 'clamp(11px, 1.5vw, 14px)',
+    fontSize: 14,
     backdropFilter: 'blur(10px)'
   },
   categoryActive: { 
-    padding: 'clamp(8px, 1.5vw, 12px) clamp(14px, 2.5vw, 24px)', 
+    padding: '12px 24px', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 24, 
     color: '#fff', 
     cursor: 'pointer', 
-    fontSize: 'clamp(11px, 1.5vw, 14px)', 
+    fontSize: 14, 
     fontWeight: 600,
     boxShadow: '0 4px 20px rgba(0,210,211,0.4)'
   },
-  marketsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 'clamp(12px, 2vw, 24px)' },
+  marketsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 },
   marketCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 'clamp(14px, 2vw, 20px)', 
-    padding: 'clamp(16px, 3vw, 24px)', 
+    borderRadius: 20, 
+    padding: 24, 
     position: 'relative',
     backdropFilter: 'blur(10px)'
   },
   trendingBadge: { 
     position: 'absolute', 
-    top: 'clamp(10px, 2vw, 16px)', 
-    right: 'clamp(10px, 2vw, 16px)', 
+    top: 16, 
+    right: 16, 
     background: 'linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,107,107,0.1))', 
-    padding: '4px 10px', 
+    padding: '6px 12px', 
     borderRadius: 12, 
-    fontSize: 'clamp(10px, 1.3vw, 12px)',
+    fontSize: 12,
     border: '1px solid rgba(255,107,107,0.3)'
   },
-  marketCategory: { fontSize: 'clamp(10px, 1.3vw, 12px)', color: '#00d2d3', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 'clamp(8px, 1.5vw, 12px)', fontWeight: 600 },
-  marketQuestion: { fontSize: 'clamp(15px, 2vw, 18px)', fontWeight: 600, marginBottom: 'clamp(14px, 2.5vw, 20px)', lineHeight: 1.4 },
-  oddsBar: { display: 'flex', borderRadius: 10, overflow: 'hidden', fontSize: 'clamp(10px, 1.3vw, 12px)', fontWeight: 600, marginBottom: 'clamp(12px, 2vw, 16px)' },
-  yesBar: { background: 'linear-gradient(135deg, #00d2d3, #0abde3)', padding: 'clamp(8px, 1.5vw, 12px)', textAlign: 'center', transition: 'width 0.5s ease' },
-  noBar: { background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', padding: 'clamp(8px, 1.5vw, 12px)', textAlign: 'center', transition: 'width 0.5s ease' },
-  marketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 'clamp(11px, 1.4vw, 13px)', color: '#666', marginBottom: 'clamp(14px, 2.5vw, 20px)' },
+  marketCategory: { fontSize: 12, color: '#00d2d3', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, fontWeight: 600 },
+  marketQuestion: { fontSize: 18, fontWeight: 600, marginBottom: 20, lineHeight: 1.4 },
+  oddsBar: { display: 'flex', borderRadius: 10, overflow: 'hidden', fontSize: 12, fontWeight: 600, marginBottom: 16 },
+  yesBar: { background: 'linear-gradient(135deg, #00d2d3, #0abde3)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
+  noBar: { background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
+  marketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#666', marginBottom: 20 },
   betButton: { 
     width: '100%', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 'clamp(13px, 1.7vw, 15px)', 
+    fontSize: 15, 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
@@ -1202,8 +1304,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   modal: { 
     background: 'linear-gradient(135deg, rgba(26,26,46,0.95), rgba(22,33,62,0.95))', 
-    borderRadius: 'clamp(16px, 3vw, 24px)', 
-    padding: 'clamp(20px, 4vw, 32px)', 
+    borderRadius: 24, 
+    padding: 32, 
     width: '100%', 
     maxWidth: 440, 
     position: 'relative', 
@@ -1213,19 +1315,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     backdropFilter: 'blur(20px)',
     boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
   },
-  closeModal: { position: 'absolute', top: 12, right: 12, background: 'none', border: 'none', color: '#666', fontSize: 'clamp(24px, 4vw, 28px)', cursor: 'pointer', transition: 'color 0.2s' },
-  modalTitle: { fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 700, marginBottom: 8 },
-  modalQuestion: { color: '#888', marginBottom: 'clamp(16px, 3vw, 24px)', lineHeight: 1.5, fontSize: 'clamp(13px, 1.7vw, 15px)' },
-  sideSelector: { display: 'flex', gap: 'clamp(8px, 1.5vw, 12px)', marginBottom: 'clamp(16px, 3vw, 24px)' },
-  sideYes: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'rgba(0,210,211,0.1)', border: '2px solid rgba(0,210,211,0.3)', borderRadius: 12, color: '#00d2d3', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer' },
-  sideYesActive: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'linear-gradient(135deg, #00d2d3, #0abde3)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,210,211,0.4)' },
-  sideNo: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'rgba(255,107,107,0.1)', border: '2px solid rgba(255,107,107,0.3)', borderRadius: 12, color: '#ff6b6b', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer' },
-  sideNoActive: { flex: 1, padding: 'clamp(12px, 2vw, 16px)', background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' },
-  amountSection: { marginBottom: 'clamp(16px, 3vw, 24px)' },
-  amountLabel: { display: 'block', marginBottom: 8, color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
+  closeModal: { position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: '#666', fontSize: 28, cursor: 'pointer', transition: 'color 0.2s' },
+  modalTitle: { fontSize: 24, fontWeight: 700, marginBottom: 8 },
+  modalQuestion: { color: '#888', marginBottom: 24, lineHeight: 1.5 },
+  sideSelector: { display: 'flex', gap: 12, marginBottom: 24 },
+  sideYes: { flex: 1, padding: 16, background: 'rgba(0,210,211,0.1)', border: '2px solid rgba(0,210,211,0.3)', borderRadius: 12, color: '#00d2d3', fontSize: 16, fontWeight: 600, cursor: 'pointer' },
+  sideYesActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #00d2d3, #0abde3)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,210,211,0.4)' },
+  sideNo: { flex: 1, padding: 16, background: 'rgba(255,107,107,0.1)', border: '2px solid rgba(255,107,107,0.3)', borderRadius: 12, color: '#ff6b6b', fontSize: 16, fontWeight: 600, cursor: 'pointer' },
+  sideNoActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' },
+  amountSection: { marginBottom: 24 },
+  amountLabel: { display: 'block', marginBottom: 8, color: '#888', fontSize: 14 },
   input: { 
     width: '100%', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
@@ -1236,206 +1338,206 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'border-color 0.3s, box-shadow 0.3s',
     outline: 'none'
   },
-  quickAmounts: { display: 'flex', gap: 'clamp(4px, 1vw, 8px)', flexWrap: 'wrap' },
-  quickAmount: { flex: 1, minWidth: 60, padding: 'clamp(8px, 1.2vw, 10px)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#888', fontSize: 'clamp(11px, 1.3vw, 12px)', cursor: 'pointer' },
+  quickAmounts: { display: 'flex', gap: 8 },
+  quickAmount: { flex: 1, padding: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#888', fontSize: 12, cursor: 'pointer' },
   potentialWin: { 
     display: 'flex', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     background: 'rgba(0,210,211,0.1)', 
     borderRadius: 12, 
-    marginBottom: 'clamp(16px, 3vw, 24px)',
+    marginBottom: 24,
     border: '1px solid rgba(0,210,211,0.2)'
   },
-  potentialValue: { fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 700, color: '#00d2d3' },
+  potentialValue: { fontSize: 24, fontWeight: 700, color: '#00d2d3' },
   confirmBet: { 
     width: '100%', 
-    padding: 'clamp(14px, 2.2vw, 18px)', 
+    padding: 18, 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 'clamp(14px, 1.8vw, 16px)', 
+    fontSize: 16, 
     fontWeight: 700, 
     cursor: 'pointer' 
   },
   authForm: { display: 'flex', flexDirection: 'column', gap: 12 },
-  authSwitch: { textAlign: 'center', color: '#666', marginTop: 16, fontSize: 'clamp(12px, 1.5vw, 14px)' },
+  authSwitch: { textAlign: 'center', color: '#666', marginTop: 16 },
   authLink: { color: '#00d2d3', cursor: 'pointer', fontWeight: 600 },
   walletNotice: { 
     background: 'linear-gradient(135deg, rgba(0,210,211,0.15), rgba(0,210,211,0.05))', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     borderRadius: 12, 
     marginBottom: 16, 
-    fontSize: 'clamp(12px, 1.5vw, 14px)', 
+    fontSize: 14, 
     color: '#00d2d3',
     border: '1px solid rgba(0,210,211,0.2)'
   },
   portfolioSection: { maxWidth: 900, margin: '0 auto' },
   sectionTitle: { 
-    fontSize: 'clamp(24px, 4vw, 36px)', 
+    fontSize: 36, 
     fontWeight: 700, 
-    marginBottom: 'clamp(20px, 4vw, 32px)', 
+    marginBottom: 32, 
     textAlign: 'center',
     fontFamily: "'Orbitron', sans-serif"
   },
-  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(10px, 2vw, 20px)', marginBottom: 'clamp(24px, 5vw, 40px)' },
+  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 40 },
   statCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 'clamp(14px, 2vw, 20px)', 
-    padding: 'clamp(16px, 3vw, 28px)', 
+    borderRadius: 20, 
+    padding: 28, 
     textAlign: 'center',
     backdropFilter: 'blur(10px)'
   },
   statValue: { 
-    fontSize: 'clamp(18px, 3vw, 28px)', 
+    fontSize: 28, 
     fontWeight: 700, 
     marginBottom: 8, 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     WebkitBackgroundClip: 'text', 
     WebkitTextFillColor: 'transparent' 
   },
-  statLabel: { color: '#666', fontSize: 'clamp(11px, 1.5vw, 14px)' },
-  subsectionTitle: { fontSize: 'clamp(16px, 2.5vw, 20px)', fontWeight: 600, marginBottom: 20 },
-  emptyState: { textAlign: 'center', padding: 'clamp(40px, 8vw, 60px) 20px', color: '#666' },
+  statLabel: { color: '#666', fontSize: 14 },
+  subsectionTitle: { fontSize: 20, fontWeight: 600, marginBottom: 20 },
+  emptyState: { textAlign: 'center', padding: '60px 20px', color: '#666' },
   ctaButton: { 
     marginTop: 20, 
-    padding: 'clamp(12px, 1.8vw, 14px) clamp(20px, 3vw, 28px)', 
+    padding: '14px 28px', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     border: 'none', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 'clamp(13px, 1.7vw, 15px)', 
+    fontSize: 15, 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
-  betsList: { display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vw, 16px)' },
+  betsList: { display: 'flex', flexDirection: 'column', gap: 16 },
   betCard: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
     borderRadius: 16, 
-    padding: 'clamp(14px, 2.5vw, 20px)',
+    padding: 20,
     backdropFilter: 'blur(10px)'
   },
   betHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: 12 },
   betSideYes: { background: 'rgba(0,210,211,0.2)', color: '#00d2d3', padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700 },
   betSideNo: { background: 'rgba(255,107,107,0.2)', color: '#ff6b6b', padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700 },
   betStatus: { fontSize: 12, fontWeight: 600 },
-  betQuestion: { marginBottom: 12, lineHeight: 1.4, fontSize: 'clamp(13px, 1.7vw, 15px)' },
-  betFooter: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)', flexWrap: 'wrap', gap: 8 },
+  betQuestion: { marginBottom: 12, lineHeight: 1.4 },
+  betFooter: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: 14 },
   leaderboardSection: { maxWidth: 700, margin: '0 auto' },
-  leaderboardSubtitle: { textAlign: 'center', color: '#666', marginBottom: 'clamp(20px, 4vw, 32px)', fontSize: 'clamp(13px, 1.7vw, 15px)' },
+  leaderboardSubtitle: { textAlign: 'center', color: '#666', marginBottom: 32 },
   leaderboardTable: { 
     background: 'rgba(255,255,255,0.03)', 
     border: '1px solid rgba(255,255,255,0.08)', 
-    borderRadius: 'clamp(14px, 2vw, 20px)', 
+    borderRadius: 20, 
     overflow: 'hidden',
     backdropFilter: 'blur(10px)'
   },
-  leaderboardHeader: { display: 'grid', gridTemplateColumns: '40px 1fr 60px 90px', padding: 'clamp(12px, 2vw, 16px) clamp(12px, 2vw, 20px)', background: 'rgba(255,255,255,0.05)', fontSize: 'clamp(10px, 1.3vw, 12px)', color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
+  leaderboardHeader: { display: 'grid', gridTemplateColumns: '60px 1fr 80px 120px', padding: '16px 20px', background: 'rgba(255,255,255,0.05)', fontSize: 12, color: '#666', textTransform: 'uppercase', letterSpacing: 1 },
   leaderboardRow: { 
     display: 'grid', 
-    gridTemplateColumns: '40px 1fr 60px 90px', 
-    padding: 'clamp(12px, 2vw, 16px) clamp(12px, 2vw, 20px)', 
+    gridTemplateColumns: '60px 1fr 80px 120px', 
+    padding: '16px 20px', 
     borderTop: '1px solid rgba(255,255,255,0.05)', 
     alignItems: 'center',
     transition: 'background 0.3s'
   },
-  lbRank: { fontWeight: 700, fontSize: 'clamp(14px, 1.8vw, 16px)' },
-  lbUser: { fontWeight: 600, fontSize: 'clamp(12px, 1.5vw, 14px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  lbBets: { color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
-  lbBalance: { color: '#00d2d3', fontWeight: 600, fontSize: 'clamp(12px, 1.5vw, 14px)', textAlign: 'right' },
-  profileInfo: { textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)' },
+  lbRank: { fontWeight: 700, fontSize: 16 },
+  lbUser: { fontWeight: 600 },
+  lbBets: { color: '#888' },
+  lbBalance: { color: '#00d2d3', fontWeight: 600 },
+  profileInfo: { textAlign: 'center', marginBottom: 24 },
   profileAvatar: { 
-    width: 'clamp(60px, 10vw, 80px)', 
-    height: 'clamp(60px, 10vw, 80px)', 
+    width: 80, 
+    height: 80, 
     borderRadius: '50%', 
     background: 'linear-gradient(135deg, #667eea, #764ba2)', 
     display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'center', 
     fontWeight: 700, 
-    fontSize: 'clamp(24px, 4vw, 32px)', 
+    fontSize: 32, 
     margin: '0 auto 16px',
     border: '3px solid rgba(0,210,211,0.3)'
   },
-  profileUsername: { fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 700, marginBottom: 4 },
-  profileEmail: { color: '#666', fontSize: 'clamp(12px, 1.5vw, 14px)' },
+  profileUsername: { fontSize: 24, fontWeight: 700, marginBottom: 4 },
+  profileEmail: { color: '#666', fontSize: 14 },
   walletSection: { 
     background: 'rgba(255,255,255,0.05)', 
     borderRadius: 16, 
-    padding: 'clamp(14px, 2.5vw, 20px)', 
-    marginBottom: 'clamp(14px, 2.5vw, 20px)',
+    padding: 20, 
+    marginBottom: 20,
     border: '1px solid rgba(255,255,255,0.08)'
   },
-  walletTitle: { fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, marginBottom: 12 },
+  walletTitle: { fontSize: 16, fontWeight: 600, marginBottom: 12 },
   walletAddress: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' },
-  addressText: { flex: 1, minWidth: 150, background: 'rgba(0,0,0,0.3)', padding: 'clamp(10px, 1.5vw, 12px) 14px', borderRadius: 10, fontSize: 'clamp(11px, 1.4vw, 13px)', fontFamily: 'monospace' },
+  addressText: { flex: 1, minWidth: 200, background: 'rgba(0,0,0,0.3)', padding: '12px 14px', borderRadius: 10, fontSize: 13, fontFamily: 'monospace' },
   copyBtn: { 
-    padding: 'clamp(10px, 1.5vw, 12px) clamp(14px, 2vw, 18px)', 
+    padding: '12px 18px', 
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)', 
     border: 'none', 
     borderRadius: 10, 
     color: '#fff', 
-    fontSize: 'clamp(11px, 1.4vw, 13px)', 
+    fontSize: 13, 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
   walletBalance: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap' },
-  solBalance: { fontSize: 'clamp(18px, 2.5vw, 20px)', fontWeight: 700, color: '#00d2d3' },
+  solBalance: { fontSize: 20, fontWeight: 700, color: '#00d2d3' },
   refreshBtn: { padding: '8px 14px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontSize: 16 },
   exportPkBtn: {
     width: '100%',
-    padding: 'clamp(12px, 1.8vw, 14px)',
+    padding: 14,
     background: 'rgba(255,193,7,0.15)',
     border: '1px solid rgba(255,193,7,0.3)',
     borderRadius: 10,
     color: '#ffc107',
-    fontSize: 'clamp(12px, 1.5vw, 14px)',
+    fontSize: 14,
     fontWeight: 600,
     cursor: 'pointer'
   },
   depositSection: { 
     background: 'linear-gradient(135deg, rgba(0,210,211,0.1), rgba(0,210,211,0.05))', 
     borderRadius: 16, 
-    padding: 'clamp(14px, 2.5vw, 20px)', 
-    marginBottom: 'clamp(14px, 2.5vw, 20px)',
+    padding: 20, 
+    marginBottom: 20,
     border: '1px solid rgba(0,210,211,0.2)'
   },
-  depositTitle: { fontSize: 'clamp(14px, 1.8vw, 16px)', fontWeight: 600, marginBottom: 8 },
-  depositText: { color: '#888', fontSize: 'clamp(12px, 1.5vw, 14px)' },
-  withdrawSection: { marginBottom: 'clamp(14px, 2.5vw, 20px)' },
+  depositTitle: { fontSize: 16, fontWeight: 600, marginBottom: 8 },
+  depositText: { color: '#888', fontSize: 14 },
+  withdrawSection: { marginBottom: 20 },
   withdrawBtn: { 
     width: '100%', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     background: 'rgba(255,255,255,0.05)', 
     border: '1px solid rgba(255,255,255,0.1)', 
     borderRadius: 12, 
     color: '#fff', 
-    fontSize: 'clamp(13px, 1.7vw, 15px)', 
+    fontSize: 15, 
     fontWeight: 600, 
     cursor: 'pointer' 
   },
   logoutBtn: { 
     width: '100%', 
-    padding: 'clamp(12px, 2vw, 16px)', 
+    padding: 16, 
     background: 'rgba(255,107,107,0.15)', 
     border: '1px solid rgba(255,107,107,0.3)', 
     borderRadius: 12, 
     color: '#ff6b6b', 
-    fontSize: 'clamp(13px, 1.7vw, 15px)', 
+    fontSize: 15, 
     fontWeight: 600, 
     cursor: 'pointer',
     transition: 'all 0.3s'
   },
-  withdrawBalance: { textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)', fontSize: 'clamp(14px, 1.8vw, 16px)' },
-  formGroup: { marginBottom: 'clamp(14px, 2.5vw, 20px)', position: 'relative' },
+  withdrawBalance: { textAlign: 'center', marginBottom: 24, fontSize: 16 },
+  formGroup: { marginBottom: 20, position: 'relative' },
   maxBtn: { position: 'absolute', right: 12, top: 38, padding: '8px 14px', background: 'rgba(0,210,211,0.2)', border: 'none', borderRadius: 8, color: '#00d2d3', fontSize: 12, fontWeight: 600, cursor: 'pointer' },
-  feeNotice: { color: '#888', fontSize: 'clamp(11px, 1.4vw, 13px)', marginBottom: 20, textAlign: 'center' },
+  feeNotice: { color: '#888', fontSize: 13, marginBottom: 20, textAlign: 'center' },
   footer: {
-    marginTop: 'clamp(40px, 8vw, 80px)',
+    marginTop: 80,
     borderTop: '1px solid rgba(255,255,255,0.1)',
     background: 'rgba(10,10,15,0.8)',
     backdropFilter: 'blur(20px)',
@@ -1445,11 +1547,11 @@ const styles: { [key: string]: React.CSSProperties } = {
   footerContent: {
     maxWidth: 1200,
     margin: '0 auto',
-    padding: 'clamp(30px, 6vw, 60px) clamp(16px, 2vw, 20px)',
+    padding: '60px 20px',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
-    gap: 'clamp(20px, 4vw, 32px)'
+    gap: 32
   },
   footerLogo: {
     display: 'flex',
@@ -1457,24 +1559,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: 10
   },
   footerLogoIcon: {
-    fontSize: 'clamp(24px, 4vw, 32px)',
+    fontSize: 32,
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent'
   },
   footerLogoText: {
-    fontSize: 'clamp(18px, 3vw, 24px)',
+    fontSize: 24,
     fontWeight: 700,
     fontFamily: "'Orbitron', sans-serif",
     letterSpacing: '2px'
   },
   footerLinks: {
     display: 'flex',
-    gap: 'clamp(12px, 2.5vw, 20px)'
+    gap: 20
   },
   socialLink: {
-    width: 'clamp(40px, 6vw, 50px)',
-    height: 'clamp(40px, 6vw, 50px)',
+    width: 50,
+    height: 50,
     borderRadius: '50%',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
@@ -1492,11 +1594,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     gap: 12,
     width: '100%',
-    maxWidth: 500,
-    padding: '0 10px'
+    maxWidth: 500
   },
   contractLabel: {
-    fontSize: 'clamp(10px, 1.3vw, 12px)',
+    fontSize: 12,
     fontWeight: 700,
     color: '#00d2d3',
     letterSpacing: '2px',
@@ -1505,46 +1606,45 @@ const styles: { [key: string]: React.CSSProperties } = {
   contractBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: 'clamp(8px, 1.5vw, 12px)',
+    gap: 12,
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 12,
-    padding: 'clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px)',
+    padding: '12px 16px',
     width: '100%'
   },
   contractAddress: {
     flex: 1,
     fontFamily: 'monospace',
-    fontSize: 'clamp(10px, 1.3vw, 13px)',
+    fontSize: 13,
     color: '#888',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap' as const
   },
   contractCopyBtn: {
-    padding: 'clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px)',
+    padding: '8px 16px',
     background: 'linear-gradient(135deg, #00d2d3, #0abde3)',
     border: 'none',
     borderRadius: 8,
     color: '#fff',
-    fontSize: 'clamp(10px, 1.3vw, 12px)',
+    fontSize: 12,
     fontWeight: 600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap' as const
+    cursor: 'pointer'
   },
   footerBottom: {
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
     gap: 8,
-    marginTop: 'clamp(10px, 2vw, 20px)'
+    marginTop: 20
   },
   footerText: {
-    fontSize: 'clamp(11px, 1.4vw, 13px)',
+    fontSize: 13,
     color: '#666'
   },
   footerTextHighlight: {
-    fontSize: 'clamp(11px, 1.4vw, 13px)',
+    fontSize: 13,
     color: '#00d2d3',
     fontWeight: 600
   }

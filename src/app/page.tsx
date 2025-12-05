@@ -2,20 +2,33 @@
 
 import { useState, useEffect } from 'react'
 
+// NEW: MarketOption type for multiple choice
+type MarketOption = {
+  id: string
+  label: string
+  odds: number
+  volume: number
+}
+
 type Market = {
   id: string
   question: string
   category: string
+  type: 'BINARY' | 'MULTIPLE_CHOICE'  // NEW
+  imageUrl: string | null              // NEW
   yesOdds: number
   volume: number
   endDate: string
   trending: boolean
+  options: MarketOption[]              // NEW
 }
 
 type Bet = {
   id: string
   amount: number
-  side: string
+  side: string | null        // Changed: now nullable for multiple choice
+  optionId: string | null    // NEW
+  option: MarketOption | null // NEW
   potentialWin: number
   status: string
   market: Market
@@ -47,6 +60,7 @@ export default function Home() {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null)
   const [betAmount, setBetAmount] = useState(0.1)
   const [betSide, setBetSide] = useState('yes')
+  const [selectedOption, setSelectedOption] = useState<string | null>(null)  // NEW
   const [showBetModal, setShowBetModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -136,31 +150,62 @@ export default function Home() {
     }
   }
 
+  // UPDATED: placeBet now supports multiple choice
   const placeBet = async () => {
     if (!user || !selectedMarket) return
+
+    const body: any = {
+      userId: user.id,
+      marketId: selectedMarket.id,
+      amount: betAmount,
+    }
+
+    // NEW: Handle multiple choice vs binary
+    if (selectedMarket.type === 'MULTIPLE_CHOICE') {
+      if (!selectedOption) {
+        showNotif('Please select an option', 'error')
+        return
+      }
+      body.optionId = selectedOption
+    } else {
+      body.side = betSide
+    }
 
     const res = await fetch('/api/bets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: user.id,
-        marketId: selectedMarket.id,
-        amount: betAmount,
-        side: betSide
-      })
+      body: JSON.stringify(body)
     })
 
     const data = await res.json()
 
     if (res.ok) {
-      showNotif(`Bet placed: ${betAmount} SOL on ${betSide.toUpperCase()}!`)
+      // NEW: Show option label for multiple choice
+      const optionLabel = selectedMarket.type === 'MULTIPLE_CHOICE' 
+        ? selectedMarket.options.find(o => o.id === selectedOption)?.label 
+        : betSide.toUpperCase()
+      showNotif(`Bet placed: ${betAmount} SOL on ${optionLabel}!`)
       setShowBetModal(false)
       setBetAmount(0.1)
+      setSelectedOption(null)  // NEW: Reset selected option
       fetchUser(user.id)
       fetchMarkets()
       fetchLeaderboard()
     } else {
       showNotif(data.error, 'error')
+    }
+  }
+
+  // NEW: getPotentialWin function for dynamic payout calculation
+  const getPotentialWin = () => {
+    if (!selectedMarket) return 0
+    if (selectedMarket.type === 'MULTIPLE_CHOICE') {
+      const option = selectedMarket.options.find(o => o.id === selectedOption)
+      if (!option) return 0
+      return betAmount * (100 / option.odds)
+    } else {
+      const odds = betSide === 'yes' ? selectedMarket.yesOdds : (100 - selectedMarket.yesOdds)
+      return betAmount * (100 / odds)
     }
   }
 
@@ -367,6 +412,18 @@ export default function Home() {
         .stagger-3 { animation: slideUp 0.6s ease-out 0.3s both; }
         .stagger-4 { animation: slideUp 0.6s ease-out 0.4s both; }
         .stagger-5 { animation: slideUp 0.6s ease-out 0.5s both; }
+        
+        /* NEW: Multiple Choice option button styles */
+        .option-btn {
+          transition: all 0.3s ease;
+        }
+        .option-btn:hover {
+          transform: scale(1.02);
+        }
+        .option-btn.selected {
+          border-color: #00d2d3 !important;
+          background: rgba(0, 210, 211, 0.15) !important;
+        }
         
         /* ========== MOBILE RESPONSIVE ========== */
         @media (max-width: 768px) {
@@ -611,17 +668,48 @@ export default function Home() {
                     }}
                   >
                     {market.trending && <div className="animate-shimmer" style={styles.trendingBadge}>🔥 Trending</div>}
-                    <div style={styles.marketCategory}>{market.category}</div>
+                    
+                    {/* NEW: Market Image */}
+                    {market.imageUrl && (
+                      <div style={styles.marketImageContainer}>
+                        <img src={market.imageUrl} alt="" style={styles.marketImage} />
+                      </div>
+                    )}
+                    
+                    {/* UPDATED: Category with MULTI badge */}
+                    <div style={styles.marketCategory}>
+                      {market.type === 'MULTIPLE_CHOICE' && <span style={styles.mcBadge}>MULTI</span>}
+                      {market.category}
+                    </div>
                     <h3 style={styles.marketQuestion}>{market.question}</h3>
                     
-                    <div style={styles.oddsBar}>
-                      <div style={{...styles.yesBar, width: `${market.yesOdds}%`}}>
-                        YES {market.yesOdds}%
+                    {/* UPDATED: Conditional odds display */}
+                    {market.type === 'BINARY' ? (
+                      <div style={styles.oddsBar}>
+                        <div style={{...styles.yesBar, width: `${market.yesOdds}%`}}>
+                          YES {market.yesOdds}%
+                        </div>
+                        <div style={{...styles.noBar, width: `${100 - market.yesOdds}%`}}>
+                          NO {100 - market.yesOdds}%
+                        </div>
                       </div>
-                      <div style={{...styles.noBar, width: `${100 - market.yesOdds}%`}}>
-                        NO {100 - market.yesOdds}%
+                    ) : (
+                      /* NEW: Options Preview for Multiple Choice */
+                      <div style={styles.optionsPreview}>
+                        {market.options && market.options.slice(0, 3).map((option) => (
+                          <div key={option.id} style={styles.optionPreviewRow}>
+                            <span style={styles.optionLabel}>{option.label}</span>
+                            <div style={styles.optionBarContainer}>
+                              <div style={{...styles.optionBar, width: `${option.odds}%`}} />
+                              <span style={styles.optionOdds}>{option.odds.toFixed(0)}%</span>
+                            </div>
+                          </div>
+                        ))}
+                        {market.options && market.options.length > 3 && (
+                          <span style={styles.moreOptions}>+{market.options.length - 3} more</span>
+                        )}
                       </div>
-                    </div>
+                    )}
 
                     <div style={styles.marketMeta}>
                       <span>📊 {market.volume.toFixed(4)} SOL</span>
@@ -636,6 +724,8 @@ export default function Home() {
                           setShowAuthModal(true)
                         } else {
                           setSelectedMarket(market)
+                          setSelectedOption(null)  // NEW: Reset option
+                          setBetSide('yes')
                           setShowBetModal(true)
                         }
                       }}
@@ -691,8 +781,9 @@ export default function Home() {
                           style={{...styles.betCard, animation: `slideUp 0.6s ease-out ${0.3 + i * 0.1}s both`}}
                         >
                           <div style={styles.betHeader}>
-                            <span style={bet.side === 'yes' ? styles.betSideYes : styles.betSideNo}>
-                              {bet.side.toUpperCase()}
+                            {/* UPDATED: Show option label for multiple choice */}
+                            <span style={bet.side === 'yes' || bet.option ? styles.betSideYes : styles.betSideNo}>
+                              {bet.option ? bet.option.label : (bet.side ? bet.side.toUpperCase() : 'N/A')}
                             </span>
                             <span style={{
                               ...styles.betStatus,
@@ -814,7 +905,7 @@ export default function Home() {
           </div>
         </footer>
 
-        {/* Bet Modal */}
+        {/* Bet Modal - UPDATED for Multiple Choice */}
         {showBetModal && selectedMarket && (
           <div style={styles.modalOverlay} onClick={() => setShowBetModal(false)}>
             <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
@@ -822,22 +913,44 @@ export default function Home() {
               <h2 style={styles.modalTitle} className="mobile-modal-title">Place Your Bet</h2>
               <p style={styles.modalQuestion}>{selectedMarket.question}</p>
               
-              <div style={styles.sideSelector}>
-                <button 
-                  className="btn-hover"
-                  style={betSide === 'yes' ? styles.sideYesActive : styles.sideYes}
-                  onClick={() => setBetSide('yes')}
-                >
-                  YES ({selectedMarket.yesOdds}%)
-                </button>
-                <button 
-                  className="btn-hover"
-                  style={betSide === 'no' ? styles.sideNoActive : styles.sideNo}
-                  onClick={() => setBetSide('no')}
-                >
-                  NO ({100 - selectedMarket.yesOdds}%)
-                </button>
-              </div>
+              {/* UPDATED: Conditional side selector */}
+              {selectedMarket.type === 'BINARY' ? (
+                <div style={styles.sideSelector}>
+                  <button 
+                    className="btn-hover"
+                    style={betSide === 'yes' ? styles.sideYesActive : styles.sideYes}
+                    onClick={() => setBetSide('yes')}
+                  >
+                    YES ({selectedMarket.yesOdds}%)
+                  </button>
+                  <button 
+                    className="btn-hover"
+                    style={betSide === 'no' ? styles.sideNoActive : styles.sideNo}
+                    onClick={() => setBetSide('no')}
+                  >
+                    NO ({100 - selectedMarket.yesOdds}%)
+                  </button>
+                </div>
+              ) : (
+                /* NEW: Options selector for Multiple Choice */
+                <div style={styles.optionsSelector}>
+                  {selectedMarket.options && selectedMarket.options.map(option => (
+                    <button
+                      key={option.id}
+                      className={`option-btn ${selectedOption === option.id ? 'selected' : ''}`}
+                      style={{
+                        ...styles.optionSelectBtn,
+                        borderColor: selectedOption === option.id ? '#00d2d3' : 'rgba(255,255,255,0.1)',
+                        background: selectedOption === option.id ? 'rgba(0,210,211,0.15)' : 'rgba(255,255,255,0.05)'
+                      }}
+                      onClick={() => setSelectedOption(option.id)}
+                    >
+                      <span style={styles.optionSelectLabel}>{option.label}</span>
+                      <span style={styles.optionSelectOdds}>{option.odds.toFixed(0)}% → {(100/option.odds).toFixed(2)}x</span>
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div style={styles.amountSection}>
                 <label style={styles.amountLabel}>Amount (SOL)</label>
@@ -857,10 +970,11 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* UPDATED: Use getPotentialWin function */}
               <div className="animate-glow" style={styles.potentialWin}>
                 <span>Potential Payout</span>
                 <span style={styles.potentialValue}>
-                  {(betAmount * (100 / (betSide === 'yes' ? selectedMarket.yesOdds : 100 - selectedMarket.yesOdds))).toFixed(4)} SOL
+                  {getPotentialWin().toFixed(4)} SOL
                 </span>
               </div>
 
@@ -1292,11 +1406,91 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: 12,
     border: '1px solid rgba(255,107,107,0.3)'
   },
-  marketCategory: { fontSize: 12, color: '#00d2d3', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12, fontWeight: 600 },
+  // NEW: Market Image styles
+  marketImageContainer: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 16
+  },
+  marketImage: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  },
+  // UPDATED: marketCategory now supports flex for badge
+  marketCategory: { 
+    fontSize: 12, 
+    color: '#00d2d3', 
+    textTransform: 'uppercase', 
+    letterSpacing: 1, 
+    marginBottom: 12, 
+    fontWeight: 600,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8
+  },
+  // NEW: Multiple Choice badge
+  mcBadge: {
+    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    color: '#fff',
+    padding: '2px 6px',
+    borderRadius: 4,
+    fontSize: 10,
+    fontWeight: 700
+  },
   marketQuestion: { fontSize: 18, fontWeight: 600, marginBottom: 20, lineHeight: 1.4 },
   oddsBar: { display: 'flex', borderRadius: 10, overflow: 'hidden', fontSize: 12, fontWeight: 600, marginBottom: 16 },
   yesBar: { background: 'linear-gradient(135deg, #00d2d3, #0abde3)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
   noBar: { background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', padding: 12, textAlign: 'center', transition: 'width 0.5s ease' },
+  // NEW: Options Preview styles for market cards
+  optionsPreview: {
+    marginBottom: 16
+  },
+  optionPreviewRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8
+  },
+  optionLabel: {
+    fontSize: 13,
+    color: '#ccc',
+    minWidth: 80,
+    maxWidth: 100,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  optionBarContainer: {
+    flex: 1,
+    height: 24,
+    background: 'rgba(255,255,255,0.1)',
+    borderRadius: 6,
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  optionBar: {
+    height: '100%',
+    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    borderRadius: 6,
+    transition: 'width 0.5s ease'
+  },
+  optionOdds: {
+    position: 'absolute',
+    right: 8,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    fontSize: 11,
+    fontWeight: 600,
+    color: '#fff'
+  },
+  moreOptions: {
+    fontSize: 12,
+    color: '#666',
+    fontStyle: 'italic'
+  },
   marketMeta: { display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#666', marginBottom: 20 },
   betButton: { 
     width: '100%', 
@@ -1344,6 +1538,33 @@ const styles: { [key: string]: React.CSSProperties } = {
   sideYesActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #00d2d3, #0abde3)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,210,211,0.4)' },
   sideNo: { flex: 1, padding: 16, background: 'rgba(255,107,107,0.1)', border: '2px solid rgba(255,107,107,0.3)', borderRadius: 12, color: '#ff6b6b', fontSize: 16, fontWeight: 600, cursor: 'pointer' },
   sideNoActive: { flex: 1, padding: 16, background: 'linear-gradient(135deg, #ff6b6b, #ee5a5a)', border: '2px solid transparent', borderRadius: 12, color: '#fff', fontSize: 16, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' },
+  // NEW: Options Selector styles for bet modal
+  optionsSelector: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    marginBottom: 24
+  },
+  optionSelectBtn: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    border: '2px solid rgba(255,255,255,0.1)',
+    borderRadius: 12,
+    cursor: 'pointer',
+    transition: 'all 0.3s ease'
+  },
+  optionSelectLabel: {
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#fff'
+  },
+  optionSelectOdds: {
+    fontSize: 13,
+    color: '#00d2d3',
+    fontWeight: 600
+  },
   amountSection: { marginBottom: 24 },
   amountLabel: { display: 'block', marginBottom: 8, color: '#888', fontSize: 14 },
   input: { 

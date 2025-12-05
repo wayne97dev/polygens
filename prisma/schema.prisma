@@ -19,29 +19,51 @@ model User {
   bets              Bet[]
 }
 
+enum MarketType {
+  BINARY
+  MULTIPLE_CHOICE
+}
+
 model Market {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   question  String
   category  String
-  yesOdds   Int      @default(50)
-  volume    Float    @default(0)
+  type      MarketType @default(BINARY)
+  imageUrl  String?
+  yesOdds   Int        @default(50)
+  volume    Float      @default(0)
   endDate   DateTime
-  resolved  Boolean  @default(false)
-  outcome   Boolean?
-  trending  Boolean  @default(false)
-  createdAt DateTime @default(now())
+  resolved  Boolean    @default(false)
+  outcome   String?
+  trending  Boolean    @default(false)
+  createdAt DateTime   @default(now())
   bets      Bet[]
+  options   MarketOption[]
+}
+
+model MarketOption {
+  id        String   @id @default(cuid())
+  marketId  String
+  market    Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  label     String
+  odds      Float    @default(20)
+  volume    Float    @default(0)
+  bets      Bet[]
+  
+  @@index([marketId])
 }
 
 model Bet {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   amount       Float
-  side         String
+  side         String?
+  optionId     String?
+  option       MarketOption? @relation(fields: [optionId], references: [id])
   potentialWin Float
-  status       String   @default("active")
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id])
+  status       String        @default("active")
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id])
   userId       String
-  market       Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  market       Market        @relation(fields: [marketId], references: [id], onDelete: Cascade)
   marketId     String
 }

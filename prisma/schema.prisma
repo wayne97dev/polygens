@@ -54,16 +54,17 @@ model MarketOption {
 }
 
 model Bet {
-  id           String        @id @default(cuid())
+  id           String   @id @default(cuid())
   amount       Float
   side         String?
   optionId     String?
   option       MarketOption? @relation(fields: [optionId], references: [id])
   potentialWin Float
-  status       String        @default("active")
-  createdAt    DateTime      @default(now())
-  user         User          @relation(fields: [userId], references: [id])
+  oddsAtBet    Float    @default(50)   // NUOVO: salva le odds al momento del bet
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
   userId       String
-  market       Market        @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id])
   marketId     String
+  market       Market   @relation(fields: [marketId], references: [id])
 }

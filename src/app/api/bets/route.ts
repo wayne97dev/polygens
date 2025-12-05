@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     let potentialWin: number
-    let odds: number
+    let oddsAtBet: number  // NEW: save odds at time of bet
 
     if (market.type === 'MULTIPLE_CHOICE') {
       if (!optionId) {
@@ -39,11 +39,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid option' }, { status: 404 })
       }
       
-      odds = option.odds
-      potentialWin = amount * (100 / odds)
+      oddsAtBet = option.odds
+      potentialWin = amount * (100 / oddsAtBet)
     } else {
-      odds = side === 'yes' ? market.yesOdds : (100 - market.yesOdds)
-      potentialWin = amount * (100 / odds)
+      oddsAtBet = side === 'yes' ? market.yesOdds : (100 - market.yesOdds)
+      potentialWin = amount * (100 / oddsAtBet)
     }
 
     if (user.solBalance < amount) {
@@ -68,6 +68,7 @@ export async function POST(request: Request) {
         side: market.type === 'BINARY' ? side : null,
         optionId: market.type === 'MULTIPLE_CHOICE' ? optionId : null,
         potentialWin,
+        oddsAtBet,  // NEW: save the odds
         status: 'active'
       }
     })

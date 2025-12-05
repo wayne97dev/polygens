@@ -71,6 +71,17 @@ export default function Home() {
   const [authForm, setAuthForm] = useState({ email: '', username: '', password: '' })
   const [notification, setNotification] = useState<{ message: string; type: string } | null>(null)
   const [mounted, setMounted] = useState(false)
+  
+  // Cash Out states
+  const [showCashOutModal, setShowCashOutModal] = useState(false)
+  const [cashOutBet, setCashOutBet] = useState<Bet | null>(null)
+  const [cashOutValue, setCashOutValue] = useState<{
+    netCashOut: number
+    fee: number
+    profitLoss: number
+    currentOdds: number
+  } | null>(null)
+  const [cashingOut, setCashingOut] = useState(false)
 
   const categories = ['All', 'Crypto', 'Tech', 'Finance', 'Politics', 'Sports']
   
@@ -288,6 +299,69 @@ export default function Home() {
     localStorage.removeItem('polygens_user_id')
     setShowProfileModal(false)
     showNotif('Logged out')
+  }
+
+  // Cash Out functions
+  const getCashOutValue = async (betId: string) => {
+    try {
+      const res = await fetch(`/api/bets/cashout?betId=${betId}`)
+      const data = await res.json()
+      if (res.ok) {
+        return data
+      }
+      return null
+    } catch (error) {
+      return null
+    }
+  }
+
+  const openCashOutModal = async (bet: Bet) => {
+    setCashOutBet(bet)
+    setShowCashOutModal(true)
+    setCashOutValue(null)
+    
+    const value = await getCashOutValue(bet.id)
+    if (value) {
+      setCashOutValue({
+        netCashOut: value.netCashOut,
+        fee: value.fee,
+        profitLoss: value.profitLoss,
+        currentOdds: value.currentOdds
+      })
+    }
+  }
+
+  const handleCashOut = async () => {
+    if (!user || !cashOutBet) return
+    
+    setCashingOut(true)
+    
+    try {
+      const res = await fetch('/api/bets/cashout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          betId: cashOutBet.id,
+          userId: user.id
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        showNotif(`Cash out successful! Received ${data.cashOutValue.toFixed(4)} SOL`)
+        setShowCashOutModal(false)
+        setCashOutBet(null)
+        setCashOutValue(null)
+        fetchUser(user.id)
+      } else {
+        showNotif(data.error || 'Cash out failed', 'error')
+      }
+    } catch (error) {
+      showNotif('Cash out failed', 'error')
+    } finally {
+      setCashingOut(false)
+    }
   }
 
   const filteredMarkets = selectedCategory === 'All'
@@ -787,9 +861,12 @@ export default function Home() {
                             </span>
                             <span style={{
                               ...styles.betStatus,
-                              color: bet.status === 'won' ? '#00d2d3' : bet.status === 'lost' ? '#ff6b6b' : '#888'
+                              color: bet.status === 'won' ? '#00d2d3' 
+                                : bet.status === 'lost' ? '#ff6b6b' 
+                                : bet.status === 'cashed_out' ? '#ffc107'
+                                : '#888'
                             }}>
-                              {bet.status.toUpperCase()}
+                              {bet.status === 'cashed_out' ? 'CASHED OUT' : bet.status.toUpperCase()}
                             </span>
                           </div>
                           <p style={styles.betQuestion}>{bet.market.question}</p>
@@ -797,6 +874,17 @@ export default function Home() {
                             <span>Stake: <strong>{bet.amount.toFixed(4)} SOL</strong></span>
                             <span>Payout: <strong style={{color: '#00d2d3'}}>{bet.potentialWin.toFixed(4)} SOL</strong></span>
                           </div>
+                          
+                          {/* Cash Out Button - only for active bets */}
+                          {bet.status === 'active' && (
+                            <button
+                              className="btn-hover"
+                              style={styles.cashOutBtn}
+                              onClick={() => openCashOutModal(bet)}
+                            >
+                              💰 Cash Out
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1146,6 +1234,81 @@ export default function Home() {
               <button className="btn-hover" style={styles.confirmBet} onClick={handleWithdraw}>
                 Confirm Withdrawal
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Cash Out Modal */}
+        {showCashOutModal && cashOutBet && (
+          <div style={styles.modalOverlay} onClick={() => { setShowCashOutModal(false); setCashOutValue(null); }}>
+            <div className="modal-enter mobile-modal" style={styles.modal} onClick={e => e.stopPropagation()}>
+              <button style={styles.closeModal} onClick={() => { setShowCashOutModal(false); setCashOutValue(null); }}>×</button>
+              <h2 style={styles.modalTitle}>💰 Cash Out</h2>
+              
+              <div style={styles.cashOutInfo}>
+                <p style={styles.cashOutQuestion}>{cashOutBet.market.question}</p>
+                
+                <div style={styles.cashOutDetails}>
+                  <div style={styles.cashOutRow}>
+                    <span>Your bet:</span>
+                    <strong>{cashOutBet.amount.toFixed(4)} SOL</strong>
+                  </div>
+                  <div style={styles.cashOutRow}>
+                    <span>Position:</span>
+                    <strong style={{color: '#00d2d3'}}>
+                      {cashOutBet.option ? cashOutBet.option.label : cashOutBet.side?.toUpperCase()}
+                    </strong>
+                  </div>
+                  <div style={styles.cashOutRow}>
+                    <span>Potential win:</span>
+                    <strong>{cashOutBet.potentialWin.toFixed(4)} SOL</strong>
+                  </div>
+                </div>
+
+                {cashOutValue ? (
+                  <div style={styles.cashOutValueBox}>
+                    <div style={styles.cashOutRow}>
+                      <span>Current odds:</span>
+                      <strong>{cashOutValue.currentOdds.toFixed(0)}%</strong>
+                    </div>
+                    <div style={styles.cashOutRow}>
+                      <span>Fee (5%):</span>
+                      <strong style={{color: '#ff6b6b'}}>-{cashOutValue.fee.toFixed(4)} SOL</strong>
+                    </div>
+                    <div style={{...styles.cashOutRow, borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: 8, paddingTop: 16}}>
+                      <span>You receive:</span>
+                      <strong style={{color: '#00d2d3', fontSize: 20}}>
+                        {cashOutValue.netCashOut.toFixed(4)} SOL
+                      </strong>
+                    </div>
+                    <div style={styles.profitLossIndicator}>
+                      {cashOutValue.profitLoss >= 0 ? (
+                        <span style={{color: '#00d2d3'}}>+{cashOutValue.profitLoss.toFixed(4)} SOL profit</span>
+                      ) : (
+                        <span style={{color: '#ff6b6b'}}>{cashOutValue.profitLoss.toFixed(4)} SOL loss</span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={styles.cashOutLoading}>Calculating...</div>
+                )}
+
+                <p style={styles.cashOutWarning}>
+                  ⚠️ Cash out is final. You will exit your position and receive the amount shown above.
+                </p>
+
+                <button 
+                  className="btn-hover"
+                  style={{
+                    ...styles.confirmBet,
+                    opacity: cashingOut || !cashOutValue ? 0.6 : 1
+                  }}
+                  onClick={handleCashOut}
+                  disabled={cashingOut || !cashOutValue}
+                >
+                  {cashingOut ? 'Processing...' : `Cash Out ${cashOutValue?.netCashOut.toFixed(4) || '...'} SOL`}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1889,5 +2052,70 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: 13,
     color: '#00d2d3',
     fontWeight: 600
+  },
+  // Cash Out Styles
+  cashOutBtn: {
+    width: '100%',
+    marginTop: 12,
+    padding: '12px 16px',
+    background: 'linear-gradient(135deg, rgba(255,193,7,0.2), rgba(255,152,0,0.2))',
+    border: '1px solid rgba(255,193,7,0.4)',
+    borderRadius: 10,
+    color: '#ffc107',
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.3s'
+  },
+  cashOutInfo: {
+    marginBottom: 20
+  },
+  cashOutQuestion: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 20,
+    lineHeight: 1.4
+  },
+  cashOutDetails: {
+    background: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16
+  },
+  cashOutRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '8px 0',
+    color: '#888',
+    fontSize: 14
+  },
+  cashOutValueBox: {
+    background: 'linear-gradient(135deg, rgba(0,210,211,0.1), rgba(0,210,211,0.05))',
+    border: '1px solid rgba(0,210,211,0.2)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16
+  },
+  profitLossIndicator: {
+    textAlign: 'center',
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: 600
+  },
+  cashOutLoading: {
+    textAlign: 'center',
+    padding: 20,
+    color: '#888'
+  },
+  cashOutWarning: {
+    background: 'rgba(255,193,7,0.1)',
+    border: '1px solid rgba(255,193,7,0.3)',
+    borderRadius: 10,
+    padding: 12,
+    color: '#ffc107',
+    fontSize: 13,
+    marginBottom: 20,
+    textAlign: 'center'
   }
 }

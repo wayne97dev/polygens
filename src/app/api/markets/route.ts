@@ -1,77 +1,77 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
+// GET all markets
 export async function GET() {
   try {
     const markets = await prisma.market.findMany({
       where: { resolved: false },
-      orderBy: { createdAt: 'desc' },
       include: {
-        options: {
-          orderBy: { odds: 'desc' }
-        }
-      }
+        options: true  // IMPORTANT: Include options for multiple choice
+      },
+      orderBy: [
+        { trending: 'desc' },
+        { createdAt: 'desc' }
+      ]
     })
+
     return NextResponse.json(markets)
   } catch (error) {
-    console.error('Error fetching markets:', error)
+    console.error('Markets fetch error:', error)
     return NextResponse.json({ error: 'Failed to fetch markets' }, { status: 500 })
   }
 }
 
+// POST create new market (admin)
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { question, category, endDate, type, imageUrl, options, yesOdds } = body
+    const { question, category, endDate, trending, type, imageUrl, options } = body
 
-    if (type === 'MULTIPLE_CHOICE') {
-      if (!options || options.length < 2 || options.length > 5) {
-        return NextResponse.json({ error: 'Multiple choice requires 2-5 options' }, { status: 400 })
-      }
-
-      const initialOdds = Math.floor(100 / options.length)
-
-      const market = await prisma.market.create({
-        data: {
-          question,
-          category,
-          type: 'MULTIPLE_CHOICE',
-          imageUrl: imageUrl || null,
-          endDate: new Date(endDate),
-          yesOdds: 0,
-          options: {
-            create: options.map((label: string, index: number) => ({
-              label,
-              odds: index === options.length - 1 
-                ? 100 - (initialOdds * (options.length - 1))
-                : initialOdds,
-              volume: 0
-            }))
-          }
-        },
-        include: { options: true }
-      })
-
-      return NextResponse.json(market)
-    } else {
-      const market = await prisma.market.create({
-        data: {
-          question,
-          category,
-          type: 'BINARY',
-          imageUrl: imageUrl || null,
-          endDate: new Date(endDate),
-          yesOdds: yesOdds || 50
-        }
-      })
-
-      return NextResponse.json(market)
+    // Validate required fields
+    if (!question || !category || !endDate) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+
+    // Build market data
+    const marketData: any = {
+      question,
+      category,
+      endDate: new Date(endDate),
+      trending: trending || false,
+      type: type || 'BINARY',
+      yesOdds: 50,
+      volume: 0
+    }
+
+    // Add imageUrl if provided
+    if (imageUrl) {
+      marketData.imageUrl = imageUrl
+    }
+
+    // Create options for multiple choice
+    if (type === 'MULTIPLE_CHOICE' && options && options.length >= 2) {
+      const initialOdds = Math.floor(100 / options.length)
+      
+      marketData.options = {
+        create: options.map((label: string, index: number) => ({
+          label,
+          odds: index === options.length - 1 
+            ? 100 - (initialOdds * (options.length - 1))  // Last option gets remainder
+            : initialOdds,
+          volume: 0
+        }))
+      }
+    }
+
+    const market = await prisma.market.create({
+      data: marketData,
+      include: { options: true }
+    })
+
+    return NextResponse.json(market)
   } catch (error) {
-    console.error('Error creating market:', error)
+    console.error('Market creation error:', error)
     return NextResponse.json({ error: 'Failed to create market' }, { status: 500 })
   }
 }

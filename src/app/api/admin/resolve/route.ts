@@ -12,7 +12,8 @@ export async function POST(request: Request) {
       include: { 
         bets: {
           include: { user: true }
-        }
+        },
+        options: true
       }
     })
 
@@ -24,9 +25,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Market already resolved' }, { status: 400 })
     }
 
-    const winningSide = outcome ? 'yes' : 'no'
-    const winningBets = market.bets.filter(bet => bet.side === winningSide)
-    const losingBets = market.bets.filter(bet => bet.side !== winningSide)
+    // Convert outcome to string for database
+    let outcomeString: string
+    let winningBets
+    let losingBets
+
+    if (market.type === 'MULTIPLE_CHOICE') {
+      // For multiple choice, outcome is the option ID (already a string)
+      outcomeString = outcome
+      winningBets = market.bets.filter(bet => bet.optionId === outcomeString)
+      losingBets = market.bets.filter(bet => bet.optionId !== outcomeString)
+    } else {
+      // For binary, convert boolean to 'yes'/'no' string
+      if (typeof outcome === 'boolean') {
+        outcomeString = outcome ? 'yes' : 'no'
+      } else {
+        outcomeString = outcome
+      }
+      winningBets = market.bets.filter(bet => bet.side === outcomeString)
+      losingBets = market.bets.filter(bet => bet.side !== outcomeString)
+    }
 
     // Calculate total payout needed
     const totalPayout = winningBets.reduce((sum, b) => sum + b.potentialWin, 0)
@@ -83,10 +101,13 @@ export async function POST(request: Request) {
       })
     }
 
-    // Resolve market
+    // Resolve market with STRING outcome
     await prisma.market.update({
       where: { id: marketId },
-      data: { resolved: true, outcome }
+      data: { 
+        resolved: true, 
+        outcome: outcomeString  // Now always a string!
+      }
     })
 
     return NextResponse.json({ 

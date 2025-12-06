@@ -1821,14 +1821,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     position: 'absolute' as const, 
     top: 20, 
     right: 20, 
-    background: 'linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,107,107,0.1))', 
+    background: 'linear-gradient(135deg, rgba(255,107,107,0.9), rgba(255,70,70,0.9))', 
     padding: '8px 14px', 
     borderRadius: 20, 
     fontSize: 12,
     fontWeight: 600,
-    border: '1px solid rgba(255,107,107,0.3)',
+    border: '1px solid rgba(255,107,107,0.5)',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    zIndex: 10,
+    backdropFilter: 'blur(10px)'
   },
   marketImageContainer: {
     width: '100%',

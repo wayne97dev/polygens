@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="152" height="152" viewBox="0 0 152 152" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12"/>
+      <stop offset="100%" style="stop-color:#050508"/>
+    </linearGradient>
+    <linearGradient id="ring1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2d3"/>
+      <stop offset="100%" style="stop-color:#00d2d3;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="ring2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="ring3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0abde3"/>
+      <stop offset="100%" style="stop-color:#0abde3;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2d3"/>
+      <stop offset="100%" style="stop-color:#0abde3"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.04" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="152" height="152" rx="30.400000000000002" fill="url(#bgGrad)"/>
+  
+  <!-- Outer ring -->
+  <circle 
+    cx="76" 
+    cy="76" 
+    r="40.432" 
+    fill="none" 
+    stroke="url(#ring1)" 
+    stroke-width="3.8000000000000003"
+    stroke-dasharray="127.68 148.96"
+    transform="rotate(30 76 76)"
+  />
+  
+  <!-- Middle ring -->
+  <circle 
+    cx="76" 
+    cy="76" 
+    r="29.792000000000005" 
+    fill="none" 
+    stroke="url(#ring2)" 
+    stroke-width="3.04"
+    stroke-dasharray="95.76 106.4"
+    transform="rotate(-45 76 76)"
+  />
+  
+  <!-- Inner ring -->
+  <circle 
+    cx="76" 
+    cy="76" 
+    r="19.152" 
+    fill="none" 
+    stroke="url(#ring3)" 
+    stroke-width="2.7359999999999998"
+    stroke-dasharray="58.52000000000001 63.84"
+    transform="rotate(60 76 76)"
+  />
+  
+  <!-- Core -->
+  <circle 
+    cx="76" 
+    cy="76" 
+    r="10.64" 
+    fill="url(#coreGrad)"
+    filter="url(#glow)"
+  />
+</svg>

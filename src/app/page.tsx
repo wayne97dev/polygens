@@ -86,7 +86,7 @@ export default function Home() {
   const categories = ['All', 'Crypto', 'Tech', 'Finance', 'Politics', 'Sports']
   
   const CONFIG = {
-    xLink: 'https://x.com/YOUR_X_HANDLE',
+    xLink: 'https://x.com/Polygens_',
     dexscreenerLink: 'https://dexscreener.com/solana/YOUR_TOKEN_ADDRESS',
     contractAddress: 'YOUR_CONTRACT_ADDRESS_HERE'
   }

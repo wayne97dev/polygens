@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12"/>
+      <stop offset="100%" style="stop-color:#050508"/>
+    </linearGradient>
+    <linearGradient id="ring1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2d3"/>
+      <stop offset="100%" style="stop-color:#00d2d3;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="ring2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#667eea;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="ring3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0abde3"/>
+      <stop offset="100%" style="stop-color:#0abde3;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d2d3"/>
+      <stop offset="100%" style="stop-color:#0abde3"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.56" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="128" height="128" rx="25.6" fill="url(#bgGrad)"/>
+  
+  <!-- Outer ring -->
+  <circle 
+    cx="64" 
+    cy="64" 
+    r="34.047999999999995" 
+    fill="none" 
+    stroke="url(#ring1)" 
+    stroke-width="3.2"
+    stroke-dasharray="107.52 125.43999999999998"
+    transform="rotate(30 64 64)"
+  />
+  
+  <!-- Middle ring -->
+  <circle 
+    cx="64" 
+    cy="64" 
+    r="25.088" 
+    fill="none" 
+    stroke="url(#ring2)" 
+    stroke-width="2.56"
+    stroke-dasharray="80.64 89.6"
+    transform="rotate(-45 64 64)"
+  />
+  
+  <!-- Inner ring -->
+  <circle 
+    cx="64" 
+    cy="64" 
+    r="16.128" 
+    fill="none" 
+    stroke="url(#ring3)" 
+    stroke-width="2.304"
+    stroke-dasharray="49.28 53.76"
+    transform="rotate(60 64 64)"
+  />
+  
+  <!-- Core -->
+  <circle 
+    cx="64" 
+    cy="64" 
+    r="8.959999999999999" 
+    fill="url(#coreGrad)"
+    filter="url(#glow)"
+  />
+</svg>

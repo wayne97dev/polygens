@@ -10,6 +10,10 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/splash-screen": "^6.0.4",
     "@prisma/client": "^6.19.0",
     "@solana/web3.js": "^1.98.4",
     "@vercel/blob": "^1.1.1",
